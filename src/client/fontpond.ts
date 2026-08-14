@@ -24,6 +24,10 @@ import {
   selectedLayoutId,
   type LayoutControls,
 } from './layout-controls';
+import {
+  addUploadedFontControl,
+  addUploadedFontOption,
+} from './uploaded-font-controls';
 
 type LoadState = 'system' | 'uploaded' | 'loaded' | 'cached';
 
@@ -38,6 +42,7 @@ interface UiReferences {
   layout: LayoutControls;
   upload: HTMLInputElement;
   uploadStatus: HTMLElement;
+  uploadedFonts: HTMLElement;
   headingSource: HTMLElement;
   bodySource: HTMLElement;
   error: HTMLElement;
@@ -91,6 +96,7 @@ function findReferences(
   const layouts = [...target.querySelectorAll<HTMLElement>('[data-layout]')];
   const simple = {
     uploadStatus: get<HTMLElement>('#upload-status'),
+    uploadedFonts: get<HTMLElement>('#uploaded-fonts'),
     headingSource: get<HTMLElement>('#heading-source'),
     bodySource: get<HTMLElement>('#body-source'),
     error: get<HTMLElement>('#font-error'),
@@ -162,31 +168,15 @@ async function handleUpload(
     return;
   }
   runtime.uploaded.set(loaded.value.id, loaded.value);
-  addUploadedOption(references.heading, loaded.value);
-  addUploadedOption(references.body, loaded.value);
+  addUploadedFontOption(references.heading, loaded.value);
+  addUploadedFontOption(references.body, loaded.value);
+  addUploadedFontControl(references.uploadedFonts, loaded.value, (font) => {
+    runtime.uploaded.set(font.id, font);
+    void updatePreview(references, runtime, loadFont);
+  });
   references.heading.value = loaded.value.id;
   references.uploadStatus.textContent = `${loaded.value.name} is ready for this tab only.`;
   await updatePreview(references, runtime, loadFont);
-}
-
-function addUploadedOption(
-  select: HTMLSelectElement,
-  font: UploadedFontDefinition,
-): void {
-  [...select.options].find((option) => option.value === font.id)?.remove();
-  let group = select.querySelector<HTMLOptGroupElement>(
-    '[data-uploaded-options]',
-  );
-  if (!group) {
-    group = select.ownerDocument.createElement('optgroup');
-    group.label = 'Uploaded this session';
-    group.dataset.uploadedOptions = '';
-    select.prepend(group);
-  }
-  const option = select.ownerDocument.createElement('option');
-  option.value = font.id;
-  option.textContent = font.name;
-  group.append(option);
 }
 
 async function updatePreview(
@@ -285,7 +275,11 @@ function sourceLabel(font: FontDefinition): string {
       : font.source === 'system'
         ? 'System'
         : 'This tab only';
-  return `${source} · ${font.category}`;
+  const weight =
+    font.source === 'uploaded' && font.metadata.weight
+      ? ` · ${font.metadata.weight}`
+      : '';
+  return `${source} · ${font.category}${weight}`;
 }
 
 function showError(

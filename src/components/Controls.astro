@@ -141,6 +141,13 @@ const layoutCopy: Record<LayoutId, { name: string; description: string }> = {
         aria-describedby="upload-note upload-status"
       />
       <p id="upload-status" class="upload-status" aria-live="polite"></p>
+      <div
+        id="uploaded-fonts"
+        class="uploaded-fonts"
+        aria-label="Uploaded font metadata"
+        hidden
+      >
+      </div>
     </div>
 
     <p id="upload-note" class="control-note">

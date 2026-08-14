@@ -54,6 +54,7 @@ test('loads a temporary local font and refreshes its score', async ({
   page,
 }) => {
   await page.goto('/');
+  await page.getByLabel('Body font').selectOption('manrope');
 
   await page
     .getByLabel('Local font')
@@ -63,16 +64,24 @@ test('loads a temporary local font and refreshes its score', async ({
     'ApfelGrotezk-Regular is ready for this tab only.',
   );
   await expect(page.locator('#heading-source')).toHaveText(
-    'This tab only · unknown',
+    'This tab only · sans · 400',
   );
   await expect(page.getByLabel('Heading font')).toHaveValue('uploaded-font-1');
   await expect(
     page.getByLabel('Body font').locator('option[value="uploaded-font-1"]'),
   ).toHaveText('ApfelGrotezk-Regular');
-  await expect(page.locator('#score-total')).toHaveText('83');
-  await expect(page.locator('#score-notes')).toContainText(
-    'Uploaded font metadata is unknown',
+  await expect(page.locator('#score-total')).toHaveText('86');
+  await expect(page.locator('#score-notes')).toBeHidden();
+  await expect(
+    page.locator('[data-uploaded-font="uploaded-font-1"]'),
+  ).toContainText('Inferred · 400 · normal');
+  const role = page.getByLabel('Role for ApfelGrotezk-Regular');
+  await expect(role).toHaveValue('sans');
+  await role.selectOption('display');
+  await expect(page.locator('#heading-source')).toHaveText(
+    'This tab only · display · 400',
   );
+  await expect(page.locator('#score-total')).toHaveText('95');
 });
 
 test('keeps every uploaded font selectable for the session', async ({
