@@ -10,6 +10,7 @@ export default [
       '.codex/',
       'coverage/',
       'dist/',
+      'journal/',
       'node_modules/',
       'playwright-report/',
       'test-results/',
