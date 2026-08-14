@@ -32,3 +32,27 @@ test('switches among all four layouts', async ({ page }) => {
     await expect(page.locator(`[data-layout="${id}"]`)).toBeVisible();
   }
 });
+
+test('fits the landing layout within a full HD viewport', async ({ page }) => {
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await page.goto('/');
+
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollHeight - window.innerHeight,
+  );
+
+  expect(overflow).toBeLessThanOrEqual(0);
+});
+
+test('fits the landing layout within a 1440 by 900 viewport', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollHeight - window.innerHeight,
+  );
+
+  expect(overflow).toBeLessThanOrEqual(0);
+});
