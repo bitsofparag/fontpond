@@ -1,0 +1,100 @@
+---
+import type { FontDefinition } from '../domain/fonts';
+import type { LayoutDefinition } from '../domain/layouts';
+
+interface Props {
+  fonts: readonly FontDefinition[];
+  layouts: readonly LayoutDefinition[];
+  headingId: string;
+  bodyId: string;
+  layoutId: string;
+}
+
+const { fonts, layouts, headingId, bodyId, layoutId } = Astro.props;
+const googleFonts = fonts.filter((font) => font.source === 'google');
+const systemFonts = fonts.filter((font) => font.source === 'system');
+---
+
+<aside class="controls-panel" aria-labelledby="controls-title">
+  <div class="controls-heading">
+    <p class="section-label">Pairing controls</p>
+    <h2 id="controls-title">Choose two voices</h2>
+    <p>Change either font. The preview responds without a page reload.</p>
+  </div>
+
+  <div class="control-stack">
+    <label class="control-field" for="heading-font">
+      <span>Heading font</span>
+      <select id="heading-font" name="heading-font">
+        <optgroup label="Google Fonts">
+          {
+            googleFonts.map((font) => (
+              <option value={font.id} selected={font.id === headingId}>
+                {font.name}
+              </option>
+            ))
+          }
+        </optgroup>
+        <optgroup label="System fonts">
+          {
+            systemFonts.map((font) => (
+              <option value={font.id} selected={font.id === headingId}>
+                {font.name}
+              </option>
+            ))
+          }
+        </optgroup>
+      </select>
+    </label>
+
+    <label class="control-field" for="body-font">
+      <span>Body font</span>
+      <select id="body-font" name="body-font">
+        <optgroup label="Google Fonts">
+          {
+            googleFonts.map((font) => (
+              <option value={font.id} selected={font.id === bodyId}>
+                {font.name}
+              </option>
+            ))
+          }
+        </optgroup>
+        <optgroup label="System fonts">
+          {
+            systemFonts.map((font) => (
+              <option value={font.id} selected={font.id === bodyId}>
+                {font.name}
+              </option>
+            ))
+          }
+        </optgroup>
+      </select>
+    </label>
+
+    <label class="control-field" for="layout">
+      <span>Layout</span>
+      <select id="layout" name="layout">
+        {
+          layouts.map((layout) => (
+            <option value={layout.id} selected={layout.id === layoutId}>
+              {layout.name}
+            </option>
+          ))
+        }
+      </select>
+    </label>
+  </div>
+
+  <p class="control-note">
+    Google Fonts load only when selected. System fonts use fonts already
+    available on your device.
+  </p>
+  <p
+    id="font-error"
+    class="inline-error"
+    role="status"
+    aria-live="polite"
+    hidden
+  >
+  </p>
+</aside>

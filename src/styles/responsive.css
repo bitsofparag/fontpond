@@ -1,0 +1,43 @@
+@media (max-width: 760px) {
+  .template-landing,
+  .template-pricing {
+    grid-template-columns: 1fr;
+  }
+
+  .template-landing > img {
+    aspect-ratio: 16 / 9;
+  }
+
+  .benefit-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .benefit-grid > div {
+    padding: 14px 0;
+  }
+
+  .benefit-grid > div + div {
+    border-top: 1px solid #c5d8d4;
+    border-left: 0;
+  }
+
+  .dashboard-heading {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .metric-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .metric-primary {
+    grid-row: auto;
+    min-height: 220px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preview-button {
+    transition: none;
+  }
+}

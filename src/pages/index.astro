@@ -1,0 +1,63 @@
+---
+import Controls from '../components/Controls.astro';
+import PreviewFrame from '../components/PreviewFrame.astro';
+import { DEFAULT_FONT_PAIR, FONT_CATALOG, findFont } from '../domain/fonts';
+import { DEFAULT_LAYOUT_ID, LAYOUT_CATALOG } from '../domain/layouts';
+import '../styles/global.css';
+import '../styles/shell.css';
+import '../styles/previews.css';
+import '../styles/responsive.css';
+
+const heading = findFont(DEFAULT_FONT_PAIR.headingId);
+const body = findFont(DEFAULT_FONT_PAIR.bodyId);
+if (!heading.ok || !body.ok)
+  throw new Error('Default font catalog is invalid.');
+const pairLabel = `${heading.value.name} with ${body.value.name}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta
+      name="description"
+      content="Test heading and body font pairs in realistic frontend layouts."
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2234%22 fill=%22none%22 stroke=%22%23147d78%22 stroke-width=%2212%22/></svg>"
+    />
+    <title>Fontpond · Test font pairings in context</title>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="Fontpond home">
+        <span class="brand-mark" aria-hidden="true"><i></i></span>
+        <span>Fontpond</span>
+      </a>
+      <p>Test font pairs where they need to work.</p>
+    </header>
+
+    <main class="app-shell">
+      <Controls
+        fonts={FONT_CATALOG}
+        layouts={LAYOUT_CATALOG}
+        headingId={heading.value.id}
+        bodyId={body.value.id}
+        layoutId={DEFAULT_LAYOUT_ID}
+      />
+      <PreviewFrame
+        headingStack={heading.value.cssStack}
+        bodyStack={body.value.cssStack}
+        pairLabel={pairLabel}
+      />
+    </main>
+
+    <script>
+      import { startFontpond } from '../client/fontpond';
+
+      void startFontpond(document);
+    </script>
+  </body>
+</html>

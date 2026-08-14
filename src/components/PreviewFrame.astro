@@ -1,0 +1,37 @@
+---
+import BlogArticle from './previews/BlogArticle.astro';
+import DashboardCard from './previews/DashboardCard.astro';
+import LandingHero from './previews/LandingHero.astro';
+import PricingCard from './previews/PricingCard.astro';
+
+interface Props {
+  headingStack: string;
+  bodyStack: string;
+  pairLabel: string;
+}
+
+const { headingStack, bodyStack, pairLabel } = Astro.props;
+---
+
+<section class="preview-panel" aria-labelledby="preview-title">
+  <header class="preview-heading">
+    <div>
+      <p class="section-label">Live preview</p>
+      <h2 id="preview-title">See the pairing in context</h2>
+    </div>
+    <p id="pair-label" aria-live="polite">{pairLabel}</p>
+  </header>
+
+  <div
+    id="preview"
+    class="preview-canvas"
+    data-testid="preview"
+    aria-label={`${pairLabel} font pairing`}
+    style={`--heading-font: ${headingStack}; --body-font: ${bodyStack};`}
+  >
+    <LandingHero />
+    <BlogArticle />
+    <DashboardCard />
+    <PricingCard />
+  </div>
+</section>
