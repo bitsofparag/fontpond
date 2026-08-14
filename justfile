@@ -10,8 +10,8 @@ default:
 
 # Add the project dependencies to a new workspace
 bootstrap:
-    @bun add astro @astrojs/cloudflare
-    @bun add --dev sst typescript @astrojs/check vitest @vitest/coverage-v8 happy-dom @playwright/test eslint @eslint/js typescript-eslint eslint-plugin-astro prettier prettier-plugin-astro
+    @bun add astro @astrojs/cloudflare fontkit
+    @bun add --dev sst typescript @types/fontkit @astrojs/check vitest @vitest/coverage-v8 happy-dom @playwright/test eslint @eslint/js typescript-eslint eslint-plugin-astro prettier prettier-plugin-astro
 
 # Install the exact dependencies from the lockfile
 install:

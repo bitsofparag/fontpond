@@ -1,4 +1,5 @@
 import type { Result } from './result';
+import type { UploadedFontMetadata } from './font-metadata';
 
 /** Describes how a font is supplied to the preview. */
 export type FontSource = 'google' | 'system' | 'uploaded';
@@ -28,6 +29,7 @@ export interface SystemFontDefinition extends BaseFontDefinition {
 /** Describes a browser-loaded font that lasts for the current page session. */
 export interface UploadedFontDefinition extends BaseFontDefinition {
   readonly source: 'uploaded';
+  readonly metadata: UploadedFontMetadata;
 }
 
 /** Describes a font that can be selected for the preview. */
@@ -169,4 +171,28 @@ export function findFont(
   return font
     ? { ok: true, value: font }
     : { ok: false, error: 'Font is unavailable.' };
+}
+
+/** Returns whether a runtime value is a supported font category. */
+export function isFontCategory(value: string): value is FontCategory {
+  return ['sans', 'serif', 'display', 'mono', 'unknown'].includes(value);
+}
+
+/** Applies a user-selected category to one uploaded font. */
+export function withUploadedFontCategory(
+  font: UploadedFontDefinition,
+  category: FontCategory,
+): UploadedFontDefinition {
+  return {
+    ...font,
+    category,
+    cssStack: `${font.cssStack.split(',')[0]}, ${genericFallback(category)}`,
+    metadata: { ...font.metadata, categorySource: 'chosen' },
+  };
+}
+
+function genericFallback(category: FontCategory): string {
+  if (category === 'serif') return 'serif';
+  if (category === 'mono') return 'monospace';
+  return 'sans-serif';
 }
