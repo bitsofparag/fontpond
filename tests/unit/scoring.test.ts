@@ -18,6 +18,23 @@ const uploaded: UploadedFontDefinition = {
   source: 'uploaded',
   category: 'unknown',
   cssStack: "'Fontpond Uploaded Font', sans-serif",
+  metadata: {
+    familyName: null,
+    categorySource: 'unknown',
+    weight: null,
+    style: 'normal',
+  },
+};
+
+const detectedUploaded: UploadedFontDefinition = {
+  ...uploaded,
+  category: 'sans',
+  metadata: {
+    familyName: 'Apfel Grotezk',
+    categorySource: 'detected',
+    weight: 400,
+    style: 'normal',
+  },
 };
 
 describe('pairing score', () => {
@@ -81,6 +98,20 @@ describe('pairing score', () => {
     expect(
       result.dimensions.find((item) => item.id === 'fallback')?.score,
     ).toBeLessThan(15);
+  });
+
+  it('uses detected uploaded metadata in hierarchy and pairing checks', () => {
+    const result = scorePair({
+      heading: detectedUploaded,
+      body: font('manrope'),
+      layoutId: 'landing-hero',
+    });
+
+    expect(result.total).toBe(86);
+    expect(result.notes).toEqual([]);
+    expect(
+      result.dimensions.find((item) => item.id === 'hierarchy')?.explanation,
+    ).not.toMatch(/visual hierarchy check/i);
   });
 
   it('keeps every catalog and layout combination within score limits', () => {

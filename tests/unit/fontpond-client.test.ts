@@ -16,6 +16,7 @@ function renderFixture(): void {
     </div>
     <input id="local-font" type="file">
     <p id="upload-status"></p>
+    <div id="uploaded-fonts" hidden></div>
     <p id="font-error" hidden></p>
     <p id="pair-label"><span id="heading-name"></span><span id="body-name"></span></p>
     <p id="layout-description"></p>
@@ -41,6 +42,12 @@ const uploadedFont: UploadedFontDefinition = {
   source: 'uploaded',
   category: 'unknown',
   cssStack: "'Fontpond Uploaded Font', sans-serif",
+  metadata: {
+    familyName: null,
+    categorySource: 'unknown',
+    weight: null,
+    style: 'normal',
+  },
 };
 const secondUploadedFont: UploadedFontDefinition = {
   id: 'uploaded-font-2',
@@ -48,6 +55,12 @@ const secondUploadedFont: UploadedFontDefinition = {
   source: 'uploaded',
   category: 'unknown',
   cssStack: "'Fontpond Uploaded Font 2', sans-serif",
+  metadata: {
+    familyName: null,
+    categorySource: 'unknown',
+    weight: null,
+    style: 'normal',
+  },
 };
 
 function localManager(

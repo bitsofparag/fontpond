@@ -21,6 +21,12 @@ const uploadedFont: UploadedFontDefinition = {
   source: 'uploaded',
   category: 'unknown',
   cssStack: "'Fontpond Uploaded Font', sans-serif",
+  metadata: {
+    familyName: null,
+    categorySource: 'unknown',
+    weight: null,
+    style: 'normal',
+  },
 };
 
 describe('Google font loader', () => {
