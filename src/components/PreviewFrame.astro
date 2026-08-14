@@ -5,35 +5,44 @@ import LandingHero from './previews/LandingHero.astro';
 import PricingCard from './previews/PricingCard.astro';
 
 interface Props {
+  headingName: string;
+  bodyName: string;
   headingStack: string;
   bodyStack: string;
-  pairLabel: string;
+  layoutDescription: string;
 }
 
-const { headingStack, bodyStack, pairLabel } = Astro.props;
+const { headingName, bodyName, headingStack, bodyStack, layoutDescription } =
+  Astro.props;
 ---
 
-<section class="preview-panel" aria-labelledby="preview-title">
-  <header class="preview-heading">
+<section class="app-column preview-panel" aria-labelledby="preview-title">
+  <header class="column-strip preview-strip">
     <div>
-      <h2 id="preview-title">See the pairing in context</h2>
+      <h2 id="preview-title">Live preview</h2>
+      <p id="layout-description">{layoutDescription}</p>
     </div>
-    <p class="preview-meta">
-      <span id="pair-label" aria-live="polite">{pairLabel}</span>
-      <small>Sample content</small>
+    <p id="pair-label" class="pair-label" aria-live="polite">
+      <span id="heading-name" style={`font-family: ${headingStack}`}>
+        {headingName}
+      </span>
+      <span aria-hidden="true">/</span>
+      <span id="body-name" style={`font-family: ${bodyStack}`}>{bodyName}</span>
     </p>
   </header>
 
-  <div
-    id="preview"
-    class="preview-canvas"
-    data-testid="preview"
-    aria-label={`${pairLabel} font pairing`}
-    style={`--heading-font: ${headingStack}; --body-font: ${bodyStack};`}
-  >
-    <LandingHero />
-    <BlogArticle />
-    <DashboardCard />
-    <PricingCard />
+  <div class="preview-scroll">
+    <div
+      id="preview"
+      class="preview-canvas"
+      data-testid="preview"
+      aria-label={`${headingName} headings with ${bodyName} body text`}
+      style={`--heading-font: ${headingStack}; --body-font: ${bodyStack};`}
+    >
+      <LandingHero />
+      <BlogArticle />
+      <DashboardCard />
+      <PricingCard />
+    </div>
   </div>
 </section>

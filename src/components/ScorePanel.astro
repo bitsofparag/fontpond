@@ -8,48 +8,62 @@ interface Props {
 const { score } = Astro.props;
 ---
 
-<aside class="score-panel" aria-labelledby="score-title">
-  <header class="score-heading">
+<section class="app-column score-column" aria-labelledby="score-title">
+  <header class="column-strip">
     <h2 id="score-title">Pairing score</h2>
-    <p>Metadata-based guidance, explained point by point.</p>
   </header>
 
-  <div class="score-result" aria-live="polite">
-    <p><output id="score-total">{score.total}</output><span>/100</span></p>
-    <p id="score-summary">{score.summary}</p>
-  </div>
+  <aside class="score-panel">
+    <div class="score-result" aria-live="polite">
+      <p><output id="score-total">{score.total}</output><span>/100</span></p>
+      <p id="score-summary">{score.summary}</p>
+      <small>
+        Five checks on font metadata and this layout. No AI, no guesses about
+        taste.
+      </small>
+    </div>
 
-  <div id="score-dimensions" class="score-dimensions">
-    {
-      score.dimensions.map((dimension) => (
-        <section data-score-dimension={dimension.id}>
-          <div>
-            <h3>{dimension.label}</h3>
-            <span data-score-value>
-              {dimension.score}/{dimension.max}
-            </span>
-          </div>
-          <meter min="0" max={dimension.max} value={dimension.score}>
-            {dimension.score} out of {dimension.max}
-          </meter>
-          <p data-score-explanation>{dimension.explanation}</p>
-        </section>
-      ))
-    }
-  </div>
+    <div id="score-dimensions" class="score-dimensions">
+      {
+        score.dimensions.map((dimension) => {
+          const percentage = Math.round(
+            (dimension.score / dimension.max) * 100,
+          );
+          return (
+            <section data-score-dimension={dimension.id}>
+              <div>
+                <h3>{dimension.label}</h3>
+                <span data-score-value>
+                  {dimension.score}/{dimension.max}
+                </span>
+              </div>
+              <div class="score-bar" aria-hidden="true">
+                <span
+                  data-score-bar
+                  data-score-level={percentage >= 75 ? 'strong' : 'check'}
+                  style={`width: ${percentage}%`}
+                />
+              </div>
+              <p data-score-explanation>{dimension.explanation}</p>
+            </section>
+          );
+        })
+      }
+    </div>
 
-  <div class="score-guidance">
-    <section data-score-guidance hidden={score.warnings.length === 0}>
-      <h3>Warnings</h3>
-      <ul id="score-warnings">
-        {score.warnings.map((warning) => <li>{warning}</li>)}
-      </ul>
-    </section>
-    <section data-score-guidance hidden={score.notes.length === 0}>
-      <h3>Review notes</h3>
-      <ul id="score-notes">
-        {score.notes.map((note) => <li>{note}</li>)}
-      </ul>
-    </section>
-  </div>
-</aside>
+    <div class="score-guidance">
+      <section data-score-guidance hidden={score.warnings.length === 0}>
+        <h3>Watch for</h3>
+        <ul id="score-warnings">
+          {score.warnings.map((warning) => <li>{warning}</li>)}
+        </ul>
+      </section>
+      <section data-score-guidance hidden={score.notes.length === 0}>
+        <h3>Review notes</h3>
+        <ul id="score-notes">
+          {score.notes.map((note) => <li>{note}</li>)}
+        </ul>
+      </section>
+    </div>
+  </aside>
+</section>

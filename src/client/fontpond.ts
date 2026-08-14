@@ -17,6 +17,13 @@ import {
   renderScore,
   type ScoreReferences,
 } from './score-renderer';
+import { uploadFailureStatus } from './upload-feedback';
+import {
+  bindLayoutControls,
+  findLayoutControls,
+  selectedLayoutId,
+  type LayoutControls,
+} from './layout-controls';
 
 type LoadState = 'system' | 'uploaded' | 'loaded' | 'cached';
 
@@ -28,13 +35,16 @@ export type FontLoader = (
 interface UiReferences {
   heading: HTMLSelectElement;
   body: HTMLSelectElement;
-  layout: HTMLSelectElement;
+  layout: LayoutControls;
   upload: HTMLInputElement;
   uploadStatus: HTMLElement;
   headingSource: HTMLElement;
   bodySource: HTMLElement;
   error: HTMLElement;
   pairLabel: HTMLElement;
+  headingName: HTMLElement;
+  bodyName: HTMLElement;
+  layoutDescription: HTMLElement;
   preview: HTMLElement;
   layouts: readonly HTMLElement[];
   score: ScoreReferences;
@@ -76,7 +86,7 @@ function findReferences(
     target.querySelector<T>(selector);
   const heading = get<HTMLSelectElement>('#heading-font');
   const body = get<HTMLSelectElement>('#body-font');
-  const layout = get<HTMLSelectElement>('#layout');
+  const layout = findLayoutControls(target);
   const upload = get<HTMLInputElement>('#local-font');
   const layouts = [...target.querySelectorAll<HTMLElement>('[data-layout]')];
   const simple = {
@@ -85,6 +95,9 @@ function findReferences(
     bodySource: get<HTMLElement>('#body-source'),
     error: get<HTMLElement>('#font-error'),
     pairLabel: get<HTMLElement>('#pair-label'),
+    headingName: get<HTMLElement>('#heading-name'),
+    bodyName: get<HTMLElement>('#body-name'),
+    layoutDescription: get<HTMLElement>('#layout-description'),
     preview: get<HTMLElement>('#preview'),
   };
   const score = findScoreReferences(target);
@@ -119,16 +132,15 @@ function bindControls(
   loadFont: FontLoader,
   localFonts: LocalFontManager,
 ): void {
-  for (const control of [
-    references.heading,
-    references.body,
-    references.layout,
-  ]) {
+  for (const control of [references.heading, references.body]) {
     control.addEventListener(
       'change',
       () => void updatePreview(references, runtime, loadFont),
     );
   }
+  bindLayoutControls(references.layout, () => {
+    void updatePreview(references, runtime, loadFont);
+  });
   references.upload.addEventListener('change', () => {
     void handleUpload(references, runtime, loadFont, localFonts);
   });
@@ -142,10 +154,10 @@ async function handleUpload(
 ): Promise<void> {
   const file = references.upload.files?.[0];
   if (!file) return;
-  references.uploadStatus.textContent = 'Loading font...';
+  references.uploadStatus.textContent = 'Loading font…';
   const loaded = await localFonts.load(file);
   if (!loaded.ok) {
-    references.uploadStatus.textContent = 'Upload not applied.';
+    references.uploadStatus.textContent = uploadFailureStatus(loaded.error);
     showError(references.error, loaded.error);
     return;
   }
@@ -153,7 +165,7 @@ async function handleUpload(
   addUploadedOption(references.heading, loaded.value);
   addUploadedOption(references.body, loaded.value);
   references.heading.value = loaded.value.id;
-  references.uploadStatus.textContent = `${loaded.value.name} is ready for this session.`;
+  references.uploadStatus.textContent = `${loaded.value.name} is ready for this tab only.`;
   await updatePreview(references, runtime, loadFont);
 }
 
@@ -207,7 +219,7 @@ function readState(
   if (!heading.ok) return heading;
   const body = runtimeFont(references.body.value, runtime.uploaded);
   if (!body.ok) return body;
-  const layout = findLayout(references.layout.value);
+  const layout = findLayout(selectedLayoutId(references.layout));
   if (!layout.ok) return layout;
   return {
     ok: true,
@@ -237,7 +249,15 @@ function renderState(references: UiReferences, state: PreviewState): void {
     'aria-label',
     `${state.heading.name} headings with ${state.body.name} body text`,
   );
-  references.pairLabel.textContent = `${state.heading.name} with ${state.body.name}`;
+  references.headingName.textContent = state.heading.name;
+  references.headingName.style.fontFamily = state.heading.cssStack;
+  references.bodyName.textContent = state.body.name;
+  references.bodyName.style.fontFamily = state.body.cssStack;
+  const selectedLayout = references.layout.buttons.find(
+    (button) => button.dataset.layoutControl === state.layoutId,
+  );
+  references.layoutDescription.textContent =
+    selectedLayout?.dataset.description ?? '';
   references.headingSource.textContent = sourceLabel(state.heading);
   references.bodySource.textContent = sourceLabel(state.body);
   for (const layout of references.layouts)
@@ -259,9 +279,13 @@ function animateUpdate(references: UiReferences): void {
 }
 
 function sourceLabel(font: FontDefinition): string {
-  if (font.source === 'google') return 'Google Font';
-  if (font.source === 'system') return 'System Font';
-  return 'Uploaded this session';
+  const source =
+    font.source === 'google'
+      ? 'Google'
+      : font.source === 'system'
+        ? 'System'
+        : 'This tab only';
+  return `${source} · ${font.category}`;
 }
 
 function showError(

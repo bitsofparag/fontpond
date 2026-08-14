@@ -44,4 +44,24 @@ describe('score renderer', () => {
 
     expect(findScoreReferences(document)).toBeUndefined();
   });
+
+  it('updates score-bar width and review level', () => {
+    const row = document.querySelector<HTMLElement>(
+      '[data-score-dimension="readability"]',
+    );
+    if (!row) throw new Error('Readability row was not found.');
+    row.innerHTML = `
+      <span data-score-value></span>
+      <div class="score-bar"><span data-score-bar></span></div>
+      <p data-score-explanation></p>
+    `;
+    const references = findScoreReferences(document);
+    if (!references) throw new Error('Complete score fixture was not found.');
+
+    renderScore(references, pairingScore());
+
+    const bar = row.querySelector<HTMLElement>('[data-score-bar]');
+    expect(bar?.style.width).toBe('100%');
+    expect(bar?.dataset.scoreLevel).toBe('strong');
+  });
 });

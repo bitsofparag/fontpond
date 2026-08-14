@@ -1,6 +1,6 @@
 ---
 import type { FontDefinition } from '../domain/fonts';
-import type { LayoutDefinition } from '../domain/layouts';
+import type { LayoutDefinition, LayoutId } from '../domain/layouts';
 
 interface Props {
   fonts: readonly FontDefinition[];
@@ -13,28 +13,45 @@ interface Props {
 const { fonts, layouts, headingId, bodyId, layoutId } = Astro.props;
 const googleFonts = fonts.filter((font) => font.source === 'google');
 const systemFonts = fonts.filter((font) => font.source === 'system');
-const sourceLabel = (source: FontDefinition['source']) =>
-  source === 'google' ? 'Google Font' : 'System Font';
 const headingFont = fonts.find((font) => font.id === headingId);
 const bodyFont = fonts.find((font) => font.id === bodyId);
+const sourceLabel = (font: FontDefinition | undefined) =>
+  `${font?.source === 'system' ? 'System' : 'Google'} · ${font?.category ?? 'unknown'}`;
+const layoutCopy: Record<LayoutId, { name: string; description: string }> = {
+  'landing-hero': {
+    name: 'Landing hero',
+    description: 'Headline, action, image, benefits',
+  },
+  'blog-article': {
+    name: 'Blog article',
+    description: 'Title, metadata, long copy, pull quote',
+  },
+  'dashboard-card': {
+    name: 'Dashboard',
+    description: 'Metrics, labels, status, small text',
+  },
+  'pricing-card': {
+    name: 'Pricing',
+    description: 'Plan, price, features, action',
+  },
+};
 ---
 
-<aside class="controls-panel" aria-labelledby="controls-title">
-  <div class="controls-heading">
-    <h2 id="controls-title">Choose two voices</h2>
-    <p>Change either font. The preview responds without a page reload.</p>
-  </div>
+<section class="app-column controls-column" aria-labelledby="controls-title">
+  <header class="column-strip">
+    <h2 id="controls-title">Controls</h2>
+  </header>
 
-  <div class="control-stack">
-    <label class="control-field" for="heading-font">
-      <span class="field-heading">
-        <span>Heading font</span>
-        <small id="heading-source"
-          >{sourceLabel(headingFont?.source ?? 'system')}</small
+  <div class="controls-body">
+    <div class="control-field">
+      <div class="field-heading">
+        <label for="heading-font"
+          ><span aria-hidden="true">01</span> Heading font</label
         >
-      </span>
-      <select id="heading-font" name="heading-font">
-        <optgroup label="Google Fonts">
+        <small id="heading-source">{sourceLabel(headingFont)}</small>
+      </div>
+      <select id="heading-font" class="input" name="heading-font">
+        <optgroup label="Google">
           {
             googleFonts.map((font) => (
               <option value={font.id} selected={font.id === headingId}>
@@ -43,7 +60,7 @@ const bodyFont = fonts.find((font) => font.id === bodyId);
             ))
           }
         </optgroup>
-        <optgroup label="System fonts">
+        <optgroup label="System">
           {
             systemFonts.map((font) => (
               <option value={font.id} selected={font.id === headingId}>
@@ -53,17 +70,17 @@ const bodyFont = fonts.find((font) => font.id === bodyId);
           }
         </optgroup>
       </select>
-    </label>
+    </div>
 
-    <label class="control-field" for="body-font">
-      <span class="field-heading">
-        <span>Body font</span>
-        <small id="body-source"
-          >{sourceLabel(bodyFont?.source ?? 'system')}</small
+    <div class="control-field">
+      <div class="field-heading">
+        <label for="body-font"
+          ><span aria-hidden="true">02</span> Body font</label
         >
-      </span>
-      <select id="body-font" name="body-font">
-        <optgroup label="Google Fonts">
+        <small id="body-source">{sourceLabel(bodyFont)}</small>
+      </div>
+      <select id="body-font" class="input" name="body-font">
+        <optgroup label="Google">
           {
             googleFonts.map((font) => (
               <option value={font.id} selected={font.id === bodyId}>
@@ -72,7 +89,7 @@ const bodyFont = fonts.find((font) => font.id === bodyId);
             ))
           }
         </optgroup>
-        <optgroup label="System fonts">
+        <optgroup label="System">
           {
             systemFonts.map((font) => (
               <option value={font.id} selected={font.id === bodyId}>
@@ -82,50 +99,61 @@ const bodyFont = fonts.find((font) => font.id === bodyId);
           }
         </optgroup>
       </select>
-    </label>
+    </div>
 
-    <label class="control-field" for="layout">
-      <span>Layout</span>
-      <select id="layout" name="layout">
+    <div class="control-field layout-field">
+      <p class="control-label"><span aria-hidden="true">03</span> Layout</p>
+      <div
+        class="layout-options"
+        role="group"
+        aria-label="Preview layout"
+        data-layout-controls
+      >
         {
           layouts.map((layout) => (
-            <option value={layout.id} selected={layout.id === layoutId}>
-              {layout.name}
-            </option>
+            <button
+              type="button"
+              data-layout-control={layout.id}
+              data-description={layoutCopy[layout.id].description}
+              aria-pressed={layout.id === layoutId}
+            >
+              <strong>{layoutCopy[layout.id].name}</strong>
+              <span>{layoutCopy[layout.id].description}</span>
+            </button>
           ))
         }
-      </select>
-    </label>
-  </div>
-
-  <div class="upload-field">
-    <div>
-      <label for="local-font">Try a local font</label>
-      <p>WOFF, WOFF2, TTF, or OTF. Maximum 5 MB.</p>
+      </div>
     </div>
-    <input
-      id="local-font"
-      name="local-font"
-      type="file"
-      accept=".woff,.woff2,.ttf,.otf,font/woff,font/woff2,font/ttf,font/otf"
-      aria-describedby="upload-note upload-status"
-    />
-    <p id="upload-status" class="upload-status" aria-live="polite">
-      No local font loaded.
+
+    <div class="upload-field">
+      <label for="local-font"
+        ><span aria-hidden="true">04</span> Local font</label
+      >
+      <p>
+        WOFF, WOFF2, TTF or OTF, up to 5 MB. It stays in this tab and is never
+        uploaded or shared.
+      </p>
+      <input
+        id="local-font"
+        name="local-font"
+        type="file"
+        accept=".woff,.woff2,.ttf,.otf,font/woff,font/woff2,font/ttf,font/otf"
+        aria-describedby="upload-note upload-status"
+      />
+      <p id="upload-status" class="upload-status" aria-live="polite"></p>
+    </div>
+
+    <p id="upload-note" class="control-note">
+      Google fonts load only when you select them. System options use faces
+      already on your device. Nothing here needs an account.
+    </p>
+    <p
+      id="font-error"
+      class="inline-error"
+      role="status"
+      aria-live="polite"
+      hidden
+    >
     </p>
   </div>
-
-  <p id="upload-note" class="control-note">
-    Google Fonts load only when selected. System fonts use fonts already
-    available on your device. Uploaded fonts stay in this browser tab and are
-    never sent anywhere.
-  </p>
-  <p
-    id="font-error"
-    class="inline-error"
-    role="status"
-    aria-live="polite"
-    hidden
-  >
-  </p>
-</aside>
+</section>

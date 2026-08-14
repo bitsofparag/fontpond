@@ -1,48 +1,6 @@
-@media (min-width: 901px) and (max-height: 1000px) {
-  .template-landing {
-    padding-block: 28px;
-  }
-
-  .template-landing > img {
-    aspect-ratio: 4 / 5;
-  }
-}
-
-@media (max-width: 760px) {
-  .template-landing,
-  .template-pricing {
-    grid-template-columns: 1fr;
-  }
-
-  .template-landing > img {
-    aspect-ratio: 16 / 9;
-  }
-
-  .benefit-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .benefit-grid > div {
-    padding: 14px 0;
-  }
-
-  .benefit-grid > div + div {
-    border-top: 1px solid #c5d8d4;
-    border-left: 0;
-  }
-
-  .dashboard-heading {
-    align-items: start;
-    flex-direction: column;
-  }
-
-  .metric-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .metric-primary {
-    grid-row: auto;
-    min-height: 220px;
+@media (max-width: 1179px) {
+  .fontpond-app {
+    width: 1180px;
   }
 }
 

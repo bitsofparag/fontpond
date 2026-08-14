@@ -10,16 +10,20 @@ function renderFixture(): void {
     <span id="heading-source"></span>
     <select id="body-font"><option value="source-serif-4">Source Serif 4</option><option value="verdana">Verdana</option></select>
     <span id="body-source"></span>
-    <select id="layout"><option value="landing-hero">Landing Hero</option><option value="blog-article">Blog Article</option></select>
+    <div role="group" aria-label="Preview layout" data-layout-controls>
+      <button type="button" data-layout-control="landing-hero" data-description="Headline, action, image, benefits" aria-pressed="true">Landing hero</button>
+      <button type="button" data-layout-control="blog-article" data-description="Title, metadata, long copy, pull quote" aria-pressed="false">Blog article</button>
+    </div>
     <input id="local-font" type="file">
     <p id="upload-status"></p>
     <p id="font-error" hidden></p>
-    <p id="pair-label"></p>
+    <p id="pair-label"><span id="heading-name"></span><span id="body-name"></span></p>
+    <p id="layout-description"></p>
     <div id="preview"><section data-layout="landing-hero"></section><section data-layout="blog-article" hidden></section></div>
     <output id="score-total"></output>
     <p id="score-summary"></p>
     <div id="score-dimensions">
-      ${['readability', 'hierarchy', 'contrast', 'fallback', 'pairing'].map((id) => `<div data-score-dimension="${id}"><span data-score-value></span><meter></meter><p data-score-explanation></p></div>`).join('')}
+      ${['readability', 'hierarchy', 'contrast', 'fallback', 'pairing'].map((id) => `<div data-score-dimension="${id}"><span data-score-value></span><div class="score-bar"><span data-score-bar></span></div><p data-score-explanation></p></div>`).join('')}
     </div>
     <section data-score-guidance><ul id="score-warnings"></ul></section>
     <section data-score-guidance><ul id="score-notes"></ul></section>
@@ -83,7 +87,7 @@ describe('Fontpond browser wiring', () => {
     ).toBe("'Source Serif 4', serif");
     expect(load).toHaveBeenCalledTimes(2);
     expect(document.querySelector('#heading-source')?.textContent).toBe(
-      'Google Font',
+      'Google · sans',
     );
     expect(document.querySelector('#score-total')?.textContent).toBe('97');
   });
@@ -91,12 +95,13 @@ describe('Fontpond browser wiring', () => {
   it('updates a font and layout after control changes', async () => {
     await startFontpond(document, successfulLoader);
     const heading = requireElement<HTMLSelectElement>('#heading-font');
-    const layout = requireElement<HTMLSelectElement>('#layout');
+    const layout = requireElement<HTMLButtonElement>(
+      '[data-layout-control="blog-article"]',
+    );
 
     heading.value = 'georgia';
     heading.dispatchEvent(new Event('change'));
-    layout.value = 'blog-article';
-    layout.dispatchEvent(new Event('change'));
+    layout.click();
 
     await vi.waitFor(() => {
       expect(
@@ -145,10 +150,10 @@ describe('Fontpond browser wiring', () => {
         'uploaded-font',
       );
       expect(document.querySelector('#heading-source')?.textContent).toBe(
-        'Uploaded this session',
+        'This tab only · unknown',
       );
       expect(document.querySelector('#upload-status')?.textContent).toBe(
-        'Apfel Grotezk is ready for this session.',
+        'Apfel Grotezk is ready for this tab only.',
       );
       expect(document.querySelector('#score-total')?.textContent).not.toBe(
         '97',
@@ -237,9 +242,32 @@ describe('Fontpond browser wiring', () => {
       expect(document.querySelector('#font-error')?.textContent).toBe(
         'The font file is empty.',
       );
+      expect(document.querySelector('#upload-status')?.textContent).toBe(
+        'That file could not be read as a font.',
+      );
     });
     expect(requireElement<HTMLSelectElement>('#heading-font').value).toBe(
       'space-grotesk',
+    );
+  });
+
+  it('gives a smaller-file recovery step for oversized uploads', async () => {
+    const manager = localManager({
+      ok: false,
+      error: 'The font file is larger than 5 MB.',
+    });
+    await startFontpond(document, successfulLoader, manager);
+    const upload = requireElement<HTMLInputElement>('#local-font');
+    Object.defineProperty(upload, 'files', {
+      value: [new File(['large'], 'large.woff2', { type: 'font/woff2' })],
+    });
+
+    upload.dispatchEvent(new Event('change'));
+
+    await vi.waitFor(() =>
+      expect(document.querySelector('#upload-status')?.textContent).toBe(
+        'That file is over 5 MB. Try a smaller one.',
+      ),
     );
   });
 

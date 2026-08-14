@@ -20,17 +20,34 @@ test('changes heading and body fonts independently', async ({ page }) => {
 
 test('switches among all four layouts', async ({ page }) => {
   await page.goto('/');
-  const layout = page.getByLabel('Layout');
+  const layouts = page.getByRole('group', { name: 'Preview layout' });
 
-  for (const id of [
-    'landing-hero',
-    'blog-article',
-    'dashboard-card',
-    'pricing-card',
-  ]) {
-    await layout.selectOption(id);
+  for (const [id, name] of [
+    ['landing-hero', 'Landing hero'],
+    ['blog-article', 'Blog article'],
+    ['dashboard-card', 'Dashboard'],
+    ['pricing-card', 'Pricing'],
+  ] as const) {
+    const button = layouts.getByRole('button', {
+      name: new RegExp(`^${name}`),
+    });
+    await button.click();
+    await expect(button).toHaveAttribute('aria-pressed', 'true');
     await expect(page.locator(`[data-layout="${id}"]`)).toBeVisible();
   }
+});
+
+test('moves through layouts with arrow keys', async ({ page }) => {
+  await page.goto('/');
+  const landing = page.getByRole('button', { name: /^Landing hero/ });
+  const article = page.getByRole('button', { name: /^Blog article/ });
+
+  await landing.focus();
+  await landing.press('ArrowDown');
+
+  await expect(article).toBeFocused();
+  await expect(article).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('[data-layout="blog-article"]')).toBeVisible();
 });
 
 test('loads a temporary local font and refreshes its score', async ({
@@ -39,14 +56,14 @@ test('loads a temporary local font and refreshes its score', async ({
   await page.goto('/');
 
   await page
-    .getByLabel('Try a local font')
+    .getByLabel('Local font')
     .setInputFiles('tests/fixtures/fonts/ApfelGrotezk-Regular.woff2');
 
   await expect(page.locator('#upload-status')).toHaveText(
-    'ApfelGrotezk-Regular is ready for this session.',
+    'ApfelGrotezk-Regular is ready for this tab only.',
   );
   await expect(page.locator('#heading-source')).toHaveText(
-    'Uploaded this session',
+    'This tab only · unknown',
   );
   await expect(page.getByLabel('Heading font')).toHaveValue('uploaded-font-1');
   await expect(
@@ -62,7 +79,7 @@ test('keeps every uploaded font selectable for the session', async ({
   page,
 }) => {
   await page.goto('/');
-  const upload = page.getByLabel('Try a local font');
+  const upload = page.getByLabel('Local font');
 
   await upload.setInputFiles('tests/fixtures/fonts/ApfelGrotezk-Regular.woff2');
   await expect(page.getByLabel('Heading font')).toHaveValue('uploaded-font-1');
@@ -70,7 +87,7 @@ test('keeps every uploaded font selectable for the session', async ({
   await upload.setInputFiles('tests/fixtures/fonts/ApfelGrotezk-Fett.otf');
   await expect(page.locator('#font-error')).toHaveText('');
   await expect(page.locator('#upload-status')).toHaveText(
-    'ApfelGrotezk-Fett is ready for this session.',
+    'ApfelGrotezk-Fett is ready for this tab only.',
   );
   await expect(page.getByLabel('Heading font')).toHaveValue('uploaded-font-2');
   await expect(
@@ -91,7 +108,7 @@ test('keeps the current pair after an invalid local upload', async ({
   await page.goto('/');
 
   await page
-    .getByLabel('Try a local font')
+    .getByLabel('Local font')
     .setInputFiles('tests/fixtures/fonts/ApfelGrotezk-LICENSE.txt');
 
   await expect(page.locator('#font-error')).toHaveText(
@@ -99,7 +116,7 @@ test('keeps the current pair after an invalid local upload', async ({
   );
   await expect(page.getByLabel('Heading font')).toHaveValue('space-grotesk');
   await expect(page.locator('#upload-status')).toHaveText(
-    'Upload not applied.',
+    'That file could not be read as a font.',
   );
 });
 
@@ -113,9 +130,11 @@ test('explains weaker hierarchy for an identical pair', async ({ page }) => {
   );
 });
 
-test('labels sample content and honors reduced motion', async ({ page }) => {
+test('labels the active layout and honors reduced motion', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByText('Sample content')).toBeVisible();
+  await expect(page.locator('#layout-description')).toHaveText(
+    'Headline, action, image, benefits',
+  );
 
   await page.getByLabel('Heading font').selectOption('georgia');
   await expect(page.getByTestId('preview')).toHaveCSS(
@@ -133,6 +152,18 @@ test('labels sample content and honors reduced motion', async ({ page }) => {
   await expect(page.locator('.score-result')).toHaveCSS(
     'animation-name',
     'none',
+  );
+});
+
+test('shows font metadata and accessible score bars', async ({ page }) => {
+  await page.goto('/');
+
+  await expect(page.locator('#heading-source')).toHaveText('Google · sans');
+  await expect(page.locator('#body-source')).toHaveText('Google · serif');
+  await expect(page.locator('[data-score-bar]')).toHaveCount(5);
+  await expect(page.locator('[data-score-bar]').first()).toHaveAttribute(
+    'style',
+    /width:\s*100%/,
   );
 });
 

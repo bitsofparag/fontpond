@@ -49,12 +49,13 @@ function updateDimension(
   const explanation = row.querySelector<HTMLElement>(
     '[data-score-explanation]',
   );
-  const meter = row.querySelector<HTMLMeterElement>('meter');
+  const bar = row.querySelector<HTMLElement>('[data-score-bar]');
   if (value) value.textContent = `${dimension.score}/${dimension.max}`;
   if (explanation) explanation.textContent = dimension.explanation;
-  if (meter) {
-    meter.max = dimension.max;
-    meter.value = dimension.score;
+  if (bar) {
+    const percentage = Math.round((dimension.score / dimension.max) * 100);
+    bar.style.width = `${percentage}%`;
+    bar.dataset.scoreLevel = percentage >= 75 ? 'strong' : 'check';
   }
 }
 
