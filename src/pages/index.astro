@@ -1,11 +1,14 @@
 ---
 import Controls from '../components/Controls.astro';
 import PreviewFrame from '../components/PreviewFrame.astro';
+import ScorePanel from '../components/ScorePanel.astro';
 import { DEFAULT_FONT_PAIR, FONT_CATALOG, findFont } from '../domain/fonts';
 import { DEFAULT_LAYOUT_ID, LAYOUT_CATALOG } from '../domain/layouts';
+import { scorePair } from '../domain/scoring';
 import '../styles/global.css';
 import '../styles/shell.css';
 import '../styles/previews.css';
+import '../styles/score.css';
 import '../styles/responsive.css';
 
 const heading = findFont(DEFAULT_FONT_PAIR.headingId);
@@ -13,6 +16,11 @@ const body = findFont(DEFAULT_FONT_PAIR.bodyId);
 if (!heading.ok || !body.ok)
   throw new Error('Default font catalog is invalid.');
 const pairLabel = `${heading.value.name} with ${body.value.name}`;
+const initialScore = scorePair({
+  heading: heading.value,
+  body: body.value,
+  layoutId: DEFAULT_LAYOUT_ID,
+});
 ---
 
 <!doctype html>
@@ -52,6 +60,7 @@ const pairLabel = `${heading.value.name} with ${body.value.name}`;
         bodyStack={body.value.cssStack}
         pairLabel={pairLabel}
       />
+      <ScorePanel score={initialScore} />
     </main>
 
     <script>

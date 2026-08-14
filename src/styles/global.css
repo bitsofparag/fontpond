@@ -57,6 +57,7 @@ a {
 }
 
 button,
+input,
 select {
   font: inherit;
 }
@@ -68,4 +69,19 @@ select {
 
 [hidden] {
   display: none !important;
+}
+
+.preview-canvas.is-updating,
+.score-result.is-updating {
+  animation: content-settle 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes content-settle {
+  from {
+    filter: saturate(0.72);
+  }
+
+  to {
+    filter: saturate(1);
+  }
 }

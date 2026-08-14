@@ -1,15 +1,28 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { startFontpond, type FontLoader } from '../../src/client/fontpond';
+import type { UploadedFontDefinition } from '../../src/domain/fonts';
+import type { LocalFontManager } from '../../src/services/local-font-loader';
 
 function renderFixture(): void {
   document.body.innerHTML = `
     <select id="heading-font"><option value="space-grotesk">Space Grotesk</option><option value="georgia">Georgia</option></select>
+    <span id="heading-source"></span>
     <select id="body-font"><option value="source-serif-4">Source Serif 4</option><option value="verdana">Verdana</option></select>
+    <span id="body-source"></span>
     <select id="layout"><option value="landing-hero">Landing Hero</option><option value="blog-article">Blog Article</option></select>
+    <input id="local-font" type="file">
+    <p id="upload-status"></p>
     <p id="font-error" hidden></p>
     <p id="pair-label"></p>
     <div id="preview"><section data-layout="landing-hero"></section><section data-layout="blog-article" hidden></section></div>
+    <output id="score-total"></output>
+    <p id="score-summary"></p>
+    <div id="score-dimensions">
+      ${['readability', 'hierarchy', 'contrast', 'fallback', 'pairing'].map((id) => `<div data-score-dimension="${id}"><span data-score-value></span><meter></meter><p data-score-explanation></p></div>`).join('')}
+    </div>
+    <section data-score-guidance><ul id="score-warnings"></ul></section>
+    <section data-score-guidance><ul id="score-notes"></ul></section>
   `;
 }
 
@@ -17,6 +30,30 @@ const successfulLoader: FontLoader = async () => ({
   ok: true,
   value: 'loaded',
 });
+
+const uploadedFont: UploadedFontDefinition = {
+  id: 'uploaded-font',
+  name: 'Apfel Grotezk',
+  source: 'uploaded',
+  category: 'unknown',
+  cssStack: "'Fontpond Uploaded Font', sans-serif",
+};
+const secondUploadedFont: UploadedFontDefinition = {
+  id: 'uploaded-font-2',
+  name: 'Commit Mono',
+  source: 'uploaded',
+  category: 'unknown',
+  cssStack: "'Fontpond Uploaded Font 2', sans-serif",
+};
+
+function localManager(
+  result: Awaited<ReturnType<LocalFontManager['load']>> = {
+    ok: true,
+    value: uploadedFont,
+  },
+): LocalFontManager {
+  return { load: vi.fn(async () => result), dispose: vi.fn() };
+}
 
 function requireElement<T extends Element>(selector: string): T {
   const element = document.querySelector<T>(selector);
@@ -45,6 +82,10 @@ describe('Fontpond browser wiring', () => {
         ?.style.getPropertyValue('--body-font'),
     ).toBe("'Source Serif 4', serif");
     expect(load).toHaveBeenCalledTimes(2);
+    expect(document.querySelector('#heading-source')?.textContent).toBe(
+      'Google Font',
+    );
+    expect(document.querySelector('#score-total')?.textContent).toBe('97');
   });
 
   it('updates a font and layout after control changes', async () => {
@@ -86,6 +127,129 @@ describe('Fontpond browser wiring', () => {
     expect(document.querySelector('#font-error')?.textContent).toBe(
       'Selected Google Font could not load. A fallback is shown.',
     );
+  });
+
+  it('loads a temporary font into both selectors and applies it to headings', async () => {
+    const manager = localManager();
+    await startFontpond(document, successfulLoader, manager);
+    const upload = requireElement<HTMLInputElement>('#local-font');
+    const file = new File([new Uint8Array([1])], 'Apfel.woff2', {
+      type: 'font/woff2',
+    });
+    Object.defineProperty(upload, 'files', { value: [file] });
+
+    upload.dispatchEvent(new Event('change'));
+
+    await vi.waitFor(() => {
+      expect(requireElement<HTMLSelectElement>('#heading-font').value).toBe(
+        'uploaded-font',
+      );
+      expect(document.querySelector('#heading-source')?.textContent).toBe(
+        'Uploaded this session',
+      );
+      expect(document.querySelector('#upload-status')?.textContent).toBe(
+        'Apfel Grotezk is ready for this session.',
+      );
+      expect(document.querySelector('#score-total')?.textContent).not.toBe(
+        '97',
+      );
+    });
+    expect(
+      document.querySelectorAll('option[value="uploaded-font"]'),
+    ).toHaveLength(2);
+  });
+
+  it('keeps earlier uploads selectable after another font is loaded', async () => {
+    const firstUploadedFont: UploadedFontDefinition = {
+      ...uploadedFont,
+      id: 'uploaded-font-1',
+      cssStack: "'Fontpond Uploaded Font 1', sans-serif",
+    };
+    const manager: LocalFontManager = {
+      load: vi
+        .fn()
+        .mockResolvedValueOnce({ ok: true, value: firstUploadedFont })
+        .mockResolvedValueOnce({ ok: true, value: secondUploadedFont }),
+      dispose: vi.fn(),
+    };
+    await startFontpond(document, successfulLoader, manager);
+    const upload = requireElement<HTMLInputElement>('#local-font');
+    Object.defineProperty(upload, 'files', {
+      configurable: true,
+      value: [new File(['first'], 'Apfel.woff2', { type: 'font/woff2' })],
+    });
+    upload.dispatchEvent(new Event('change'));
+    await vi.waitFor(() =>
+      expect(requireElement<HTMLSelectElement>('#heading-font').value).toBe(
+        'uploaded-font-1',
+      ),
+    );
+
+    Object.defineProperty(upload, 'files', {
+      configurable: true,
+      value: [new File(['second'], 'Commit.otf', { type: 'font/otf' })],
+    });
+    upload.dispatchEvent(new Event('change'));
+    await vi.waitFor(() =>
+      expect(requireElement<HTMLSelectElement>('#heading-font').value).toBe(
+        'uploaded-font-2',
+      ),
+    );
+
+    expect(
+      [
+        ...document.querySelectorAll<HTMLOptionElement>(
+          '[data-uploaded-options] option',
+        ),
+      ].map((option) => option.value),
+    ).toEqual([
+      'uploaded-font-1',
+      'uploaded-font-2',
+      'uploaded-font-1',
+      'uploaded-font-2',
+    ]);
+    const body = requireElement<HTMLSelectElement>('#body-font');
+    body.value = 'uploaded-font-1';
+    body.dispatchEvent(new Event('change'));
+    await vi.waitFor(() =>
+      expect(
+        requireElement<HTMLElement>('#preview').style.getPropertyValue(
+          '--body-font',
+        ),
+      ).toBe("'Fontpond Uploaded Font 1', sans-serif"),
+    );
+  });
+
+  it('keeps the current pair when a local upload fails', async () => {
+    const manager = localManager({
+      ok: false,
+      error: 'The font file is empty.',
+    });
+    await startFontpond(document, successfulLoader, manager);
+    const upload = requireElement<HTMLInputElement>('#local-font');
+    Object.defineProperty(upload, 'files', {
+      value: [new File([], 'empty.woff2', { type: 'font/woff2' })],
+    });
+
+    upload.dispatchEvent(new Event('change'));
+
+    await vi.waitFor(() => {
+      expect(document.querySelector('#font-error')?.textContent).toBe(
+        'The font file is empty.',
+      );
+    });
+    expect(requireElement<HTMLSelectElement>('#heading-font').value).toBe(
+      'space-grotesk',
+    );
+  });
+
+  it('disposes the temporary font when the page session ends', async () => {
+    const manager = localManager();
+    await startFontpond(document, successfulLoader, manager);
+
+    window.dispatchEvent(new Event('pagehide'));
+
+    expect(manager.dispose).toHaveBeenCalledTimes(1);
   });
 
   it('returns a safe error when required markup is missing', async () => {

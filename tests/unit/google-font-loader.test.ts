@@ -1,6 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { FONT_CATALOG, type FontDefinition } from '../../src/domain/fonts';
+import {
+  FONT_CATALOG,
+  type FontDefinition,
+  type UploadedFontDefinition,
+} from '../../src/domain/fonts';
 import { createGoogleFontLoader } from '../../src/services/google-font-loader';
 
 function requireFont(source: FontDefinition['source']): FontDefinition {
@@ -11,6 +15,13 @@ function requireFont(source: FontDefinition['source']): FontDefinition {
 
 const googleFont = requireFont('google');
 const systemFont = requireFont('system');
+const uploadedFont: UploadedFontDefinition = {
+  id: 'uploaded-font',
+  name: 'Temporary font',
+  source: 'uploaded',
+  category: 'unknown',
+  cssStack: "'Fontpond Uploaded Font', sans-serif",
+};
 
 describe('Google font loader', () => {
   beforeEach(() => {
@@ -23,6 +34,16 @@ describe('Google font loader', () => {
     await expect(load(systemFont)).resolves.toEqual({
       ok: true,
       value: 'system',
+    });
+    expect(document.head.querySelectorAll('link')).toHaveLength(0);
+  });
+
+  it('does not create a request for an uploaded font', async () => {
+    const load = createGoogleFontLoader(document);
+
+    await expect(load(uploadedFont)).resolves.toEqual({
+      ok: true,
+      value: 'uploaded',
     });
     expect(document.head.querySelectorAll('link')).toHaveLength(0);
   });

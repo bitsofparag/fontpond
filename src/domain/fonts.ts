@@ -1,10 +1,10 @@
 import type { Result } from './result';
 
 /** Describes how a font is supplied to the preview. */
-export type FontSource = 'google' | 'system';
+export type FontSource = 'google' | 'system' | 'uploaded';
 
 /** Groups fonts by their intended typographic role. */
-export type FontCategory = 'sans' | 'serif' | 'display' | 'mono';
+export type FontCategory = 'sans' | 'serif' | 'display' | 'mono' | 'unknown';
 
 interface BaseFontDefinition {
   readonly id: string;
@@ -25,8 +25,14 @@ export interface SystemFontDefinition extends BaseFontDefinition {
   readonly source: 'system';
 }
 
+/** Describes a browser-loaded font that lasts for the current page session. */
+export interface UploadedFontDefinition extends BaseFontDefinition {
+  readonly source: 'uploaded';
+}
+
 /** Describes a font that can be selected for the preview. */
-export type FontDefinition = GoogleFontDefinition | SystemFontDefinition;
+export type FontDefinition =
+  GoogleFontDefinition | SystemFontDefinition | UploadedFontDefinition;
 
 /** Curated fonts available at the first demo checkpoint. */
 export const FONT_CATALOG: readonly FontDefinition[] = [

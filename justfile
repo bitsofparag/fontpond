@@ -20,6 +20,9 @@ dev host="127.0.0.1":
 format:
     @bun x prettier --write .
 
+format-files *paths:
+    @bun x prettier --write {{paths}}
+
 format-check:
     @bun x prettier --check .
 

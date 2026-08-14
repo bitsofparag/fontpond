@@ -7,7 +7,6 @@
 .template h2,
 .template h3,
 .template strong,
-.template-kicker,
 .preview-button {
   font-family: var(--heading-font, system-ui, sans-serif);
 }
@@ -16,15 +15,6 @@
 .template h3,
 .template p {
   margin-top: 0;
-}
-
-.template-kicker {
-  margin-bottom: 16px;
-  color: #246c66;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
 }
 
 .preview-button {
@@ -68,9 +58,9 @@
 .landing-copy h2 {
   max-width: 12ch;
   margin-bottom: 20px;
-  font-size: clamp(2.6rem, 5.4vw, 5.8rem);
+  font-size: clamp(2.6rem, 4vw, 5.8rem);
   line-height: 0.96;
-  letter-spacing: -0.06em;
+  letter-spacing: -0.04em;
 }
 
 .template-lede {
@@ -133,7 +123,7 @@
   margin-bottom: 20px;
   font-size: clamp(2.5rem, 5.2vw, 4.8rem);
   line-height: 1.02;
-  letter-spacing: -0.055em;
+  letter-spacing: -0.04em;
 }
 
 .article-meta {
@@ -151,8 +141,8 @@
 
 .article-body blockquote {
   margin: 40px 0;
-  padding-left: 24px;
-  border-left: 4px solid #4d928b;
+  padding: 24px 0;
+  border-block: 1px solid #8db8b1;
   color: #17322f;
   font-family: var(--heading-font, system-ui, sans-serif);
   font-size: clamp(1.35rem, 2.3vw, 1.9rem);
@@ -176,7 +166,7 @@
   margin-bottom: 14px;
   font-size: clamp(2.2rem, 4.5vw, 4rem);
   line-height: 1.03;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.04em;
 }
 
 .status-label {
@@ -219,7 +209,7 @@
 
 .metric strong {
   font-size: clamp(2.5rem, 6vw, 5.5rem);
-  letter-spacing: -0.06em;
+  letter-spacing: -0.04em;
 }
 
 .dashboard-note {
@@ -277,7 +267,7 @@
 .plan-price strong {
   color: #17322f;
   font-size: clamp(3rem, 6vw, 5.2rem);
-  letter-spacing: -0.06em;
+  letter-spacing: -0.04em;
 }
 
 .plan-card ul {

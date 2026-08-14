@@ -47,7 +47,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .preview-button {
+  .preview-button,
+  .preview-canvas.is-updating,
+  .score-result.is-updating {
+    animation: none;
     transition: none;
   }
 }

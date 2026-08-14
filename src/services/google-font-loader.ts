@@ -1,7 +1,7 @@
 import type { FontDefinition, GoogleFontDefinition } from '../domain/fonts';
 import type { Result } from '../domain/result';
 
-type FontLoadState = 'system' | 'loaded' | 'cached';
+type FontLoadState = 'system' | 'uploaded' | 'loaded' | 'cached';
 type FontLoadResult = Result<
   FontLoadState,
   'Selected Google Font could not load.'
@@ -19,7 +19,7 @@ export function createGoogleFontLoader(
   target: Document,
 ): (font: FontDefinition) => Promise<FontLoadResult> {
   return async (font: FontDefinition): Promise<FontLoadResult> => {
-    if (font.source === 'system') return { ok: true, value: 'system' };
+    if (font.source !== 'google') return { ok: true, value: font.source };
 
     const selector = `link[data-font-id="${font.id}"]`;
     if (target.head.querySelector(selector))

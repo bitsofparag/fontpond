@@ -13,18 +13,26 @@ interface Props {
 const { fonts, layouts, headingId, bodyId, layoutId } = Astro.props;
 const googleFonts = fonts.filter((font) => font.source === 'google');
 const systemFonts = fonts.filter((font) => font.source === 'system');
+const sourceLabel = (source: FontDefinition['source']) =>
+  source === 'google' ? 'Google Font' : 'System Font';
+const headingFont = fonts.find((font) => font.id === headingId);
+const bodyFont = fonts.find((font) => font.id === bodyId);
 ---
 
 <aside class="controls-panel" aria-labelledby="controls-title">
   <div class="controls-heading">
-    <p class="section-label">Pairing controls</p>
     <h2 id="controls-title">Choose two voices</h2>
     <p>Change either font. The preview responds without a page reload.</p>
   </div>
 
   <div class="control-stack">
     <label class="control-field" for="heading-font">
-      <span>Heading font</span>
+      <span class="field-heading">
+        <span>Heading font</span>
+        <small id="heading-source"
+          >{sourceLabel(headingFont?.source ?? 'system')}</small
+        >
+      </span>
       <select id="heading-font" name="heading-font">
         <optgroup label="Google Fonts">
           {
@@ -48,7 +56,12 @@ const systemFonts = fonts.filter((font) => font.source === 'system');
     </label>
 
     <label class="control-field" for="body-font">
-      <span>Body font</span>
+      <span class="field-heading">
+        <span>Body font</span>
+        <small id="body-source"
+          >{sourceLabel(bodyFont?.source ?? 'system')}</small
+        >
+      </span>
       <select id="body-font" name="body-font">
         <optgroup label="Google Fonts">
           {
@@ -85,9 +98,27 @@ const systemFonts = fonts.filter((font) => font.source === 'system');
     </label>
   </div>
 
-  <p class="control-note">
+  <div class="upload-field">
+    <div>
+      <label for="local-font">Try a local font</label>
+      <p>WOFF, WOFF2, TTF, or OTF. Maximum 5 MB.</p>
+    </div>
+    <input
+      id="local-font"
+      name="local-font"
+      type="file"
+      accept=".woff,.woff2,.ttf,.otf,font/woff,font/woff2,font/ttf,font/otf"
+      aria-describedby="upload-note upload-status"
+    />
+    <p id="upload-status" class="upload-status" aria-live="polite">
+      No local font loaded.
+    </p>
+  </div>
+
+  <p id="upload-note" class="control-note">
     Google Fonts load only when selected. System fonts use fonts already
-    available on your device.
+    available on your device. Uploaded fonts stay in this browser tab and are
+    never sent anywhere.
   </p>
   <p
     id="font-error"
