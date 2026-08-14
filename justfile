@@ -27,7 +27,7 @@ sst-install:
 
 # Start the Astro development server with hot reload
 dev host="127.0.0.1":
-    @bun x astro dev --host {{host}}
+    @ASTRO_DEV_BACKGROUND=0 bun x astro dev --host {{host}}
 
 # Format all supported project files
 format:
