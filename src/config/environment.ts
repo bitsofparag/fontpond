@@ -1,31 +1,39 @@
 import type { Result } from '../domain/result';
 
-const PRODUCTION_VARIABLES = [
-  'CLOUDFLARE_ACCOUNT_ID',
+const DEPLOYMENT_VARIABLES = [
+  'CLOUDFLARE_DEFAULT_ACCOUNT_ID',
   'CLOUDFLARE_API_TOKEN',
 ] as const;
 
 type Environment = Readonly<Record<string, string | undefined>>;
 
-/** Validates only the variables required by the requested application stage. */
+/** Validates credentials for every stage that deploys infrastructure. */
 export function validateEnvironment(
   stage: string,
   environment: Environment,
 ): Result<void, string> {
-  if (stage !== 'production') {
+  if (stage === 'development') {
     return { ok: true, value: undefined };
   }
 
-  const missing = PRODUCTION_VARIABLES.filter(
-    (name) => !environment[name]?.trim(),
+  const missing = DEPLOYMENT_VARIABLES.filter((name) =>
+    isMissing(environment[name]),
   );
 
   if (missing.length > 0) {
     return {
       ok: false,
-      error: `Missing required production variables: ${missing.join(', ')}`,
+      error: `Missing required deployment variables: ${missing.join(', ')}`,
     };
   }
 
   return { ok: true, value: undefined };
+}
+
+function isMissing(value: string | undefined): boolean {
+  const normalized = value?.trim() ?? '';
+  return (
+    normalized.length === 0 ||
+    /^(your_|changeme$|xxx$|placeholder$)/i.test(normalized)
+  );
 }

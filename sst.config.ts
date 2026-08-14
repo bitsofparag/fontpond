@@ -1,4 +1,5 @@
-import './.sst/platform/config.d.ts';
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="./.sst/platform/config.d.ts" />
 
 export default $config({
   app(input) {
@@ -12,6 +13,12 @@ export default $config({
     };
   },
   async run() {
-    new sst.cloudflare.Astro('FontpondWeb');
+    const { deploymentDomain } = await import('./src/config/deployment');
+    const site = new sst.cloudflare.Astro('FontpondWeb', {
+      buildCommand: 'just build',
+      domain: deploymentDomain($app.stage),
+    });
+
+    return { url: site.url };
   },
 });

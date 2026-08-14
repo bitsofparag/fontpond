@@ -1,5 +1,6 @@
 set shell := ["bash", "-euo", "pipefail", "-c"]
 export ASTRO_TELEMETRY_DISABLED := "1"
+export SST_TELEMETRY_DISABLED := "1"
 set dotenv-load := true
 set dotenv-filename := ".env.local"
 set dotenv-override := true
@@ -84,7 +85,16 @@ preview host="127.0.0.1":
 validate-env stage="development":
     @bun run scripts/validate-environment.ts {{stage}}
 
+# Preview one SST stage without changing Cloudflare
+plan stage="production":
+    @bun run scripts/validate-environment.ts {{stage}}
+    @bun x sst diff --stage {{stage}}
+
 # Validate and deploy one SST stage
 deploy stage="production":
     @bun run scripts/validate-environment.ts {{stage}}
     @bun x sst deploy --stage {{stage}}
+
+# Check the production domain over HTTPS
+smoke-production:
+    @curl --fail --silent --show-error --location --max-time 20 https://fontpond.com >/dev/null
