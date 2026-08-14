@@ -89,6 +89,7 @@ dist
 .sst/
 .wrangler/
 test-results/
+playwright-report/
 
 # Gatsby files
 .cache/

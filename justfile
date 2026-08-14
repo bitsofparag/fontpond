@@ -41,6 +41,9 @@ test-browser:
 install-browser:
     @bun x playwright install chromium
 
+install-browser-ci:
+    @bun x playwright install --with-deps chromium
+
 check: format-check lint typecheck test coverage
 
 build:
