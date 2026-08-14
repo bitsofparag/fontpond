@@ -1,5 +1,5 @@
 .template-dashboard {
-  padding: 48px;
+  padding: 44px;
 }
 
 .dashboard-heading {
@@ -8,25 +8,25 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 24px;
-  border-bottom: 2px solid var(--preview-rule);
+  border-bottom: 2px solid var(--sheet-rule);
 }
 
 .dashboard-heading h2 {
   margin-bottom: 10px;
-  font-size: 42px;
+  font-size: 40px;
   line-height: 1.03;
   letter-spacing: -0.04em;
 }
 
 .dashboard-heading p {
   margin-bottom: 0;
-  color: var(--preview-muted);
+  color: var(--sheet-sub);
   font-size: 14px;
 }
 
 .status-label {
   padding: 8px 12px;
-  border: 2px solid var(--preview-rule);
+  border: 2px solid var(--sheet-rule);
   font-family: var(--heading-font, system-ui, sans-serif);
   font-size: 11px;
   font-weight: 700;
@@ -39,26 +39,26 @@
   display: grid;
   grid-template-columns: 1.4fr 1fr 1fr;
   gap: 2px;
-  border: 2px solid var(--preview-rule);
-  background: var(--preview-rule);
+  border: 2px solid var(--sheet-rule);
+  background: var(--sheet-rule);
 }
 
 .metric {
-  min-height: 220px;
-  padding: 24px;
+  min-height: 210px;
+  padding: 22px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background: var(--preview-bg);
+  background: var(--sheet-tile-b);
 }
 
 .metric-primary {
-  padding: 26px;
-  background: var(--preview-metric);
+  padding: 24px;
+  background: var(--sheet-tile-a);
 }
 
 .metric > span {
-  color: var(--preview-muted);
+  color: var(--sheet-sub);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.12em;
@@ -67,27 +67,27 @@
 
 .metric strong {
   display: block;
-  font-size: 44px;
+  font-size: 40px;
   line-height: 1;
   letter-spacing: -0.04em;
 }
 
 .metric-primary strong {
-  font-size: 76px;
+  font-size: 68px;
   line-height: 0.9;
   letter-spacing: -0.05em;
 }
 
 .metric strong small {
   color: inherit;
-  font-size: 18px;
+  font-size: 17px;
   letter-spacing: 0;
 }
 
 .metric div > small {
   margin-top: 8px;
   display: block;
-  color: var(--preview-muted);
+  color: var(--sheet-sub);
   font-size: 13px;
   line-height: 1.45;
 }
@@ -98,9 +98,9 @@
 
 .dashboard-note {
   margin-top: 2px;
-  padding: 26px;
-  color: var(--preview-inverse);
-  background: var(--preview-text);
+  padding: 24px;
+  color: var(--sheet-note-fg);
+  background: var(--sheet-note-bg);
 }
 
 .dashboard-note h3 {
@@ -111,22 +111,22 @@
 .dashboard-note p {
   max-width: 64ch;
   margin-bottom: 0;
-  color: var(--preview-row-rule);
+  color: var(--sheet-note-body);
   font-size: 14px;
   line-height: 1.6;
 }
 
 .template-pricing {
-  padding: 56px;
+  padding: 48px;
   display: grid;
-  grid-template-columns: minmax(0, 0.95fr) minmax(280px, 0.7fr);
-  gap: 64px;
+  grid-template-columns: minmax(0, 0.95fr) minmax(240px, 0.7fr);
+  gap: 48px;
   align-items: start;
 }
 
 .pricing-intro h2 {
   margin-bottom: 18px;
-  font-size: 48px;
+  font-size: 44px;
   line-height: 1.03;
   letter-spacing: -0.04em;
 }
@@ -134,7 +134,7 @@
 .pricing-intro > p {
   max-width: 42ch;
   margin-bottom: 28px;
-  color: var(--preview-copy);
+  color: var(--sheet-body);
   font-size: 17px;
   line-height: 1.6;
 }
@@ -143,14 +143,14 @@
   padding-top: 18px;
   display: grid;
   gap: 10px;
-  border-top: 2px solid var(--preview-rule);
-  color: var(--preview-copy);
+  border-top: 2px solid var(--sheet-rule);
+  color: var(--sheet-body);
   font-size: 14px;
 }
 
 .plan-card {
-  padding: 32px;
-  border: 2px solid var(--preview-rule);
+  padding: 28px;
+  border: 2px solid var(--sheet-rule);
 }
 
 .plan-card h3 {
@@ -166,13 +166,13 @@
 }
 
 .plan-price strong {
-  font-size: 60px;
+  font-size: 56px;
   line-height: 0.95;
   letter-spacing: -0.05em;
 }
 
 .plan-price span {
-  color: var(--preview-muted);
+  color: var(--sheet-sub);
   font-size: 14px;
 }
 
@@ -181,7 +181,7 @@
   padding: 0;
   display: grid;
   gap: 11px;
-  color: var(--preview-copy);
+  color: var(--sheet-body);
   font-size: 14px;
   line-height: 1.45;
   list-style: none;
@@ -189,7 +189,7 @@
 
 .plan-card li {
   padding-top: 11px;
-  border-top: 2px solid var(--preview-row-rule);
+  border-top: 2px solid var(--sheet-soft-rule);
 }
 
 .plan-card .preview-button {

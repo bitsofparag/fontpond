@@ -50,6 +50,28 @@ test('moves through layouts with arrow keys', async ({ page }) => {
   await expect(page.locator('[data-layout="blog-article"]')).toBeVisible();
 });
 
+test('switches sheet polarity and compares both themes', async ({ page }) => {
+  await page.goto('/');
+
+  const sheet = page.getByRole('group', { name: 'Sheet theme' });
+  const view = page.getByRole('group', { name: 'Preview view' });
+  await sheet.getByRole('button', { name: 'Dark' }).click();
+
+  await expect(page.getByTestId('preview')).toHaveAttribute(
+    'data-sheet-theme',
+    'dark',
+  );
+  await view.getByRole('button', { name: 'Split' }).click();
+  await expect(page.locator('[data-preview-pane]')).toHaveCount(2);
+  await expect(page.locator('[data-preview-pane="reversed"]')).toHaveAttribute(
+    'data-sheet-theme',
+    'light',
+  );
+  await expect(page.locator('#preview-view-hint')).toHaveText(
+    'Same block, both polarities',
+  );
+});
+
 test('loads a temporary local font and refreshes its score', async ({
   page,
 }) => {

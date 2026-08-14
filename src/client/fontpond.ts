@@ -28,6 +28,7 @@ import {
   addUploadedFontControl,
   addUploadedFontOption,
 } from './uploaded-font-controls';
+import { bindPreviewSettings, findPreviewSettings } from './preview-settings';
 
 type LoadState = 'system' | 'uploaded' | 'loaded' | 'cached';
 
@@ -75,8 +76,12 @@ export async function startFontpond(
 ): Promise<Result<void, string>> {
   const references = findReferences(target);
   if (!references.ok) return references;
+  const previewSettings = findPreviewSettings(target);
+  if (!previewSettings)
+    return { ok: false, error: 'Preview settings are unavailable.' };
 
   const runtime: RuntimeState = { uploaded: new Map() };
+  bindPreviewSettings(previewSettings);
   bindControls(references.value, runtime, loadFont, localFonts);
   target.defaultView?.addEventListener('pagehide', () => localFonts.dispose(), {
     once: true,
@@ -250,7 +255,9 @@ function renderState(references: UiReferences, state: PreviewState): void {
     selectedLayout?.dataset.description ?? '';
   references.headingSource.textContent = sourceLabel(state.heading);
   references.bodySource.textContent = sourceLabel(state.body);
-  for (const layout of references.layouts)
+  for (const layout of references.preview.querySelectorAll<HTMLElement>(
+    '[data-layout]',
+  ))
     layout.hidden = layout.dataset.layout !== state.layoutId;
   renderScore(references.score, scorePair(state));
   animateUpdate(references);

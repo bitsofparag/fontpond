@@ -1,8 +1,5 @@
 ---
-import BlogArticle from './previews/BlogArticle.astro';
-import DashboardCard from './previews/DashboardCard.astro';
-import LandingHero from './previews/LandingHero.astro';
-import PricingCard from './previews/PricingCard.astro';
+import PreviewPane from './PreviewPane.astro';
 
 interface Props {
   headingName: string;
@@ -31,18 +28,46 @@ const { headingName, bodyName, headingStack, bodyStack, layoutDescription } =
     </p>
   </header>
 
+  <form class="preview-toolbar" aria-label="Preview settings">
+    <fieldset class="setting-group" data-sheet-controls>
+      <legend class="visually-hidden">Sheet theme</legend>
+      <span aria-hidden="true">Sheet</span>
+      <div class="segmented-control">
+        <button type="button" data-sheet-control="light" aria-pressed="true">
+          Light
+        </button>
+        <button type="button" data-sheet-control="dark" aria-pressed="false">
+          Dark
+        </button>
+      </div>
+    </fieldset>
+    <fieldset class="setting-group" data-view-controls>
+      <legend class="visually-hidden">Preview view</legend>
+      <span aria-hidden="true">View</span>
+      <div class="segmented-control">
+        <button type="button" data-view-control="single" aria-pressed="true">
+          Single
+        </button>
+        <button type="button" data-view-control="split" aria-pressed="false">
+          Split
+        </button>
+      </div>
+    </fieldset>
+    <output id="preview-view-hint" aria-live="polite">
+      One sheet at a time
+    </output>
+  </form>
+
   <div class="preview-scroll">
     <div
       id="preview"
       class="preview-canvas"
       data-testid="preview"
+      data-sheet-theme="light"
       aria-label={`${headingName} headings with ${bodyName} body text`}
       style={`--heading-font: ${headingStack}; --body-font: ${bodyStack};`}
     >
-      <LandingHero />
-      <BlogArticle />
-      <DashboardCard />
-      <PricingCard />
+      <PreviewPane />
     </div>
   </div>
 </section>

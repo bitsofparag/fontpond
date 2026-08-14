@@ -20,7 +20,16 @@ function renderFixture(): void {
     <p id="font-error" hidden></p>
     <p id="pair-label"><span id="heading-name"></span><span id="body-name"></span></p>
     <p id="layout-description"></p>
-    <div id="preview"><section data-layout="landing-hero"></section><section data-layout="blog-article" hidden></section></div>
+    <div data-sheet-controls>
+      <button data-sheet-control="light" aria-pressed="true">Light</button>
+      <button data-sheet-control="dark" aria-pressed="false">Dark</button>
+    </div>
+    <div data-view-controls>
+      <button data-view-control="single" aria-pressed="true">Single</button>
+      <button data-view-control="split" aria-pressed="false">Split</button>
+    </div>
+    <span id="preview-view-hint"></span>
+    <div id="preview"><div data-preview-pane="primary"><section data-layout="landing-hero"></section><section data-layout="blog-article" hidden></section></div></div>
     <output id="score-total"></output>
     <p id="score-summary"></p>
     <div id="score-dimensions">
@@ -126,6 +135,30 @@ describe('Fontpond browser wiring', () => {
         document.querySelector<HTMLElement>('[data-layout="blog-article"]')
           ?.hidden,
       ).toBe(false);
+    });
+  });
+
+  it('updates both panes when the layout changes in split view', async () => {
+    await startFontpond(document, successfulLoader);
+    requireElement<HTMLButtonElement>('[data-view-control="split"]').click();
+    requireElement<HTMLButtonElement>(
+      '[data-layout-control="blog-article"]',
+    ).click();
+
+    await vi.waitFor(() => {
+      const articles = [
+        ...document.querySelectorAll<HTMLElement>(
+          '[data-layout="blog-article"]',
+        ),
+      ];
+      const landing = [
+        ...document.querySelectorAll<HTMLElement>(
+          '[data-layout="landing-hero"]',
+        ),
+      ];
+      expect(articles).toHaveLength(2);
+      expect(articles.every((layout) => !layout.hidden)).toBe(true);
+      expect(landing.every((layout) => layout.hidden)).toBe(true);
     });
   });
 
