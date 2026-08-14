@@ -10,4 +10,9 @@ export default defineConfig({
     enabled: false,
   },
   output: 'server',
+  vite: {
+    optimizeDeps: {
+      include: ['fontkit'],
+    },
+  },
 });
