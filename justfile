@@ -17,6 +17,7 @@ bootstrap:
 # Install the exact dependencies from the lockfile
 install:
     @bun install --frozen-lockfile
+    @just sst-install
 
 # Sync installed dependencies with package.json
 sync:
