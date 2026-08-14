@@ -1,0 +1,11 @@
+.agents/
+.astro/
+.codegraph/
+.codex/
+.sst/
+coverage/
+dist/
+journal/
+node_modules/
+playwright-report/
+test-results/

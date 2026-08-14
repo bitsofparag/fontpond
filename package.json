@@ -1,0 +1,25 @@
+{
+  "name": "fontpond",
+  "private": true,
+  "type": "module",
+  "packageManager": "bun@1.3.14",
+  "dependencies": {
+    "@astrojs/cloudflare": "^14.2.1",
+    "astro": "^7.2.2"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.62.1",
+    "@vitest/coverage-v8": "^4.1.10",
+    "eslint": "^10.8.1",
+    "eslint-plugin-astro": "^3.1.0",
+    "happy-dom": "^20.11.2",
+    "prettier": "^3.9.6",
+    "prettier-plugin-astro": "^0.14.1",
+    "sst": "^4.17.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.67.0",
+    "vitest": "^4.1.10"
+  }
+}
