@@ -40,6 +40,11 @@
   font-family: var(--body-font, system-ui, sans-serif);
 }
 
+.preview-pane ::selection {
+  color: var(--sheet-cta-fg);
+  background: var(--sheet-cta-bg);
+}
+
 .preview-pane + .preview-pane {
   border-top: 2px solid #34302f;
 }

@@ -61,6 +61,14 @@ test('switches sheet polarity and compares both themes', async ({ page }) => {
     'data-sheet-theme',
     'dark',
   );
+  await expect(page.locator('.preview-button').first()).toHaveCSS(
+    'background-color',
+    'rgb(244, 242, 240)',
+  );
+  await expect(page.locator('.preview-button').first()).toHaveCSS(
+    'color',
+    'rgb(28, 26, 25)',
+  );
   await view.getByRole('button', { name: 'Split' }).click();
   await expect(page.locator('[data-preview-pane]')).toHaveCount(2);
   await expect(page.locator('[data-preview-pane="reversed"]')).toHaveAttribute(

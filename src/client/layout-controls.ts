@@ -23,6 +23,11 @@ export function selectedLayoutId(controls: LayoutControls): string {
   return selected?.dataset.layoutControl ?? '';
 }
 
+/** Selects one layout without emitting a control event. */
+export function selectLayout(controls: LayoutControls, layoutId: string): void {
+  setSelection(controls, layoutId, false);
+}
+
 /** Connects pointer and arrow-key selection for the layout group. */
 export function bindLayoutControls(
   controls: LayoutControls,

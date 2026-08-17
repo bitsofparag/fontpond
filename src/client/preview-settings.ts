@@ -25,7 +25,8 @@ export interface PreviewSettingsController {
   set(settings: PreviewSettings): void;
 }
 
-const DEFAULT_SETTINGS: PreviewSettings = {
+/** Default preview settings used on first load and reset. */
+export const DEFAULT_PREVIEW_SETTINGS: PreviewSettings = {
   sheetTheme: 'light',
   previewView: 'single',
 };
@@ -53,7 +54,8 @@ export function findPreviewSettings(
 /** Connects preview setting controls and returns a state boundary. */
 export function bindPreviewSettings(
   references: PreviewSettingReferences,
-  initial: PreviewSettings = DEFAULT_SETTINGS,
+  initial: PreviewSettings = DEFAULT_PREVIEW_SETTINGS,
+  onChange: () => void = () => undefined,
 ): PreviewSettingsController {
   let settings = initial;
   const set = (next: PreviewSettings): void => {
@@ -61,12 +63,16 @@ export function bindPreviewSettings(
     renderSettings(references, settings);
   };
   bindSegment(references.sheetButtons, 'sheetControl', (value) => {
-    if (value === 'light' || value === 'dark')
+    if (value === 'light' || value === 'dark') {
       set({ ...settings, sheetTheme: value });
+      onChange();
+    }
   });
   bindSegment(references.viewButtons, 'viewControl', (value) => {
-    if (value === 'single' || value === 'split')
+    if (value === 'single' || value === 'split') {
       set({ ...settings, previewView: value });
+      onChange();
+    }
   });
   set(initial);
   return { read: () => settings, set };

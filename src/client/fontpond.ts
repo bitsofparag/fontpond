@@ -154,17 +154,20 @@ function bindControls(
   runtime: RuntimeState,
   loadFont: FontLoader,
   localFonts: LocalFontManager,
+  onChange: () => void,
 ): void {
   for (const control of [references.heading, references.body]) {
-    control.addEventListener(
-      'change',
-      () => void updatePreview(references, runtime, loadFont),
-    );
+    control.addEventListener('change', () => {
+      onChange();
+      void updatePreview(references, runtime, loadFont);
+    });
   }
   bindLayoutControls(references.layout, () => {
+    onChange();
     void updatePreview(references, runtime, loadFont);
   });
   references.upload.addEventListener('change', () => {
+    onChange();
     void handleUpload(references, runtime, loadFont, localFonts);
   });
 }
