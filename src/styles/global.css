@@ -15,6 +15,14 @@
   --color-neutral-700: #605d5d;
   --color-neutral-800: #444141;
   --font-app: 'Archivo', system-ui, sans-serif;
+  --text-xs: 0.75rem;
+  --text-sm: 0.8125rem;
+  --text-base: 0.875rem;
+  --text-md: 0.9375rem;
+  --text-lg: 1rem;
+  --text-xl: 1.125rem;
+  --text-2xl: 1.375rem;
+  --text-total: 4.75rem;
   font-family: var(--font-app);
   font-synthesis: none;
 }
@@ -36,7 +44,7 @@ body {
 body {
   color: var(--color-text);
   font-family: var(--font-app);
-  font-size: 16px;
+  font-size: var(--text-lg);
   line-height: 1.55;
 }
 
@@ -63,7 +71,7 @@ button:disabled {
   border-radius: 0;
   color: var(--color-text);
   background: transparent;
-  font-size: 13px;
+  font-size: var(--text-sm);
   font-weight: 700;
   text-align: left;
   white-space: nowrap;

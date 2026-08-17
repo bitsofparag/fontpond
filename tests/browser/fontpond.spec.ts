@@ -262,3 +262,21 @@ test('fits the landing layout within a 1440 by 900 viewport', async ({
 
   expect(overflow).toBeLessThanOrEqual(0);
 });
+
+test('scales chrome and rails without scaling the preview specimen', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1800, height: 1000 });
+  await page.goto('/');
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = '20px';
+  });
+
+  await expect(page.locator('.controls-column')).toHaveCSS('width', '435px');
+  await expect(page.locator('.score-column')).toHaveCSS('width', '465px');
+  await expect(page.locator('.control-label')).toHaveCSS(
+    'font-size',
+    '16.25px',
+  );
+  await expect(page.locator('.template-lede')).toHaveCSS('font-size', '19px');
+});
