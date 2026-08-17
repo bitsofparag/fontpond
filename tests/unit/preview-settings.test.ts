@@ -15,7 +15,6 @@ function renderFixture(): void {
       <button data-view-control="single" aria-pressed="true">Single</button>
       <button data-view-control="split" aria-pressed="false">Split</button>
     </div>
-    <span id="preview-view-hint">One sheet at a time</span>
     <div id="preview">
       <div data-preview-pane="primary" data-sheet-theme="light">
         <article data-layout="landing-hero">Preview</article>
@@ -68,12 +67,9 @@ describe('preview settings', () => {
     expect(reversed?.querySelector('.reversed-label')?.textContent).toContain(
       'Reversed',
     );
-    expect(references.hint.textContent).toBe('Same block, both polarities');
-
     references.viewButtons[0]?.click();
 
     expect(document.querySelector('[data-preview-pane="reversed"]')).toBeNull();
-    expect(references.hint.textContent).toBe('One sheet at a time');
   });
 
   it('keeps split panes in opposite themes when the sheet changes', () => {

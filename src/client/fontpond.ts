@@ -50,7 +50,6 @@ interface UiReferences {
   pairLabel: HTMLElement;
   headingName: HTMLElement;
   bodyName: HTMLElement;
-  layoutDescription: HTMLElement;
   preview: HTMLElement;
   layouts: readonly HTMLElement[];
   score: ScoreReferences;
@@ -120,7 +119,6 @@ function findReferences(
     pairLabel: get<HTMLElement>('#pair-label'),
     headingName: get<HTMLElement>('#heading-name'),
     bodyName: get<HTMLElement>('#body-name'),
-    layoutDescription: get<HTMLElement>('#layout-description'),
     preview: get<HTMLElement>('#preview'),
   };
   const score = findScoreReferences(target);
@@ -195,7 +193,7 @@ async function handleUpload(
     void updatePreview(references, runtime, loadFont);
   });
   references.heading.value = loaded.value.id;
-  references.uploadStatus.textContent = `${loaded.value.name} is ready for this tab only.`;
+  references.uploadStatus.textContent = `${loaded.value.name} is ready.`;
   await updatePreview(references, runtime, loadFont);
 }
 
@@ -263,11 +261,6 @@ function renderState(references: UiReferences, state: PreviewState): void {
   references.headingName.style.fontFamily = state.heading.cssStack;
   references.bodyName.textContent = state.body.name;
   references.bodyName.style.fontFamily = state.body.cssStack;
-  const selectedLayout = references.layout.buttons.find(
-    (button) => button.dataset.layoutControl === state.layoutId,
-  );
-  references.layoutDescription.textContent =
-    selectedLayout?.dataset.description ?? '';
   references.headingSource.textContent = sourceLabel(state.heading);
   references.bodySource.textContent = sourceLabel(state.body);
   for (const layout of references.preview.querySelectorAll<HTMLElement>(

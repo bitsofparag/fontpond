@@ -14,15 +14,14 @@ function renderFixture(): void {
     <select id="body-font"><option value="source-serif-4">Source Serif 4</option><option value="verdana">Verdana</option></select>
     <span id="body-source"></span>
     <div role="group" aria-label="Preview layout" data-layout-controls>
-      <button type="button" data-layout-control="landing-hero" data-description="Headline, action, image, benefits" aria-pressed="true">Landing hero</button>
-      <button type="button" data-layout-control="blog-article" data-description="Title, metadata, long copy, pull quote" aria-pressed="false">Blog article</button>
+      <button type="button" data-layout-control="landing-hero" aria-pressed="true">Landing hero</button>
+      <button type="button" data-layout-control="blog-article" aria-pressed="false">Blog article</button>
     </div>
     <input id="local-font" type="file">
     <p id="upload-status"></p>
     <div id="uploaded-fonts" hidden></div>
     <p id="font-error" hidden></p>
     <p id="pair-label"><span id="heading-name"></span><span id="body-name"></span></p>
-    <p id="layout-description"></p>
     <div data-sheet-controls>
       <button data-sheet-control="light" aria-pressed="true">Light</button>
       <button data-sheet-control="dark" aria-pressed="false">Dark</button>
@@ -31,7 +30,6 @@ function renderFixture(): void {
       <button data-view-control="single" aria-pressed="true">Single</button>
       <button data-view-control="split" aria-pressed="false">Split</button>
     </div>
-    <span id="preview-view-hint"></span>
     <div id="preview"><div data-preview-pane="primary"><section data-layout="landing-hero"></section><section data-layout="blog-article" hidden></section></div></div>
     <output id="score-total"></output>
     <p id="score-summary"></p>
@@ -270,7 +268,7 @@ describe('Fontpond browser wiring', () => {
         'This tab only · unknown',
       );
       expect(document.querySelector('#upload-status')?.textContent).toBe(
-        'Apfel Grotezk is ready for this tab only.',
+        'Apfel Grotezk is ready.',
       );
       expect(document.querySelector('#score-total')?.textContent).not.toBe(
         '97',

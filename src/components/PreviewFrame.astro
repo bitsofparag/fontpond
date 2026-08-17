@@ -6,19 +6,14 @@ interface Props {
   bodyName: string;
   headingStack: string;
   bodyStack: string;
-  layoutDescription: string;
 }
 
-const { headingName, bodyName, headingStack, bodyStack, layoutDescription } =
-  Astro.props;
+const { headingName, bodyName, headingStack, bodyStack } = Astro.props;
 ---
 
 <section class="app-column preview-panel" aria-labelledby="preview-title">
   <header class="column-strip preview-strip">
-    <div>
-      <h2 id="preview-title">Live preview</h2>
-      <p id="layout-description">{layoutDescription}</p>
-    </div>
+    <h2 id="preview-title">Live preview</h2>
     <p id="pair-label" class="pair-label" aria-live="polite">
       <span id="heading-name" style={`font-family: ${headingStack}`}>
         {headingName}
@@ -30,8 +25,8 @@ const { headingName, bodyName, headingStack, bodyStack, layoutDescription } =
 
   <form class="preview-toolbar" aria-label="Preview settings">
     <fieldset class="setting-group" data-sheet-controls>
-      <legend class="visually-hidden">Sheet theme</legend>
-      <span aria-hidden="true">Sheet</span>
+      <legend class="visually-hidden">Preview theme</legend>
+      <span aria-hidden="true">Theme</span>
       <div class="segmented-control">
         <button type="button" data-sheet-control="light" aria-pressed="true">
           Light
@@ -53,9 +48,6 @@ const { headingName, bodyName, headingStack, bodyStack, layoutDescription } =
         </button>
       </div>
     </fieldset>
-    <output id="preview-view-hint" aria-live="polite">
-      One sheet at a time
-    </output>
   </form>
 
   <div class="preview-scroll">

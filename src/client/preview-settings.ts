@@ -14,7 +14,6 @@ export interface PreviewSettings {
 export interface PreviewSettingReferences {
   preview: HTMLElement;
   primaryPane: HTMLElement;
-  hint: HTMLElement;
   sheetButtons: readonly HTMLButtonElement[];
   viewButtons: readonly HTMLButtonElement[];
 }
@@ -39,15 +38,13 @@ export function findPreviewSettings(
   const primaryPane = target.querySelector<HTMLElement>(
     '[data-preview-pane="primary"]',
   );
-  const hint = target.querySelector<HTMLElement>('#preview-view-hint');
   const sheetButtons = buttons(target, '[data-sheet-control]');
   const viewButtons = buttons(target, '[data-view-control]');
   return preview &&
     primaryPane &&
-    hint &&
     sheetButtons.length === 2 &&
     viewButtons.length === 2
-    ? { preview, primaryPane, hint, sheetButtons, viewButtons }
+    ? { preview, primaryPane, sheetButtons, viewButtons }
     : undefined;
 }
 
@@ -131,10 +128,6 @@ function renderSettings(
   selectButton(references.sheetButtons, settings.sheetTheme);
   selectButton(references.viewButtons, settings.previewView);
   renderReversedPane(references, settings);
-  references.hint.textContent =
-    settings.previewView === 'split'
-      ? 'Same block, both polarities'
-      : 'One sheet at a time';
 }
 
 function selectButton(

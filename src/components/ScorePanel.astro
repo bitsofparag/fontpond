@@ -17,10 +17,7 @@ const { score } = Astro.props;
     <div class="score-result" aria-live="polite">
       <p><output id="score-total">{score.total}</output><span>/100</span></p>
       <p id="score-summary">{score.summary}</p>
-      <small>
-        Five checks on font metadata and this layout. No AI, no guesses about
-        taste.
-      </small>
+      <small>Five metadata and layout checks. No AI.</small>
     </div>
 
     <div id="score-dimensions" class="score-dimensions">

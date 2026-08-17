@@ -53,7 +53,7 @@ test('moves through layouts with arrow keys', async ({ page }) => {
 test('switches sheet polarity and compares both themes', async ({ page }) => {
   await page.goto('/');
 
-  const sheet = page.getByRole('group', { name: 'Sheet theme' });
+  const sheet = page.getByRole('group', { name: 'Preview theme' });
   const view = page.getByRole('group', { name: 'Preview view' });
   await sheet.getByRole('button', { name: 'Dark' }).click();
 
@@ -75,9 +75,27 @@ test('switches sheet polarity and compares both themes', async ({ page }) => {
     'data-sheet-theme',
     'light',
   );
-  await expect(page.locator('#preview-view-hint')).toHaveText(
-    'Same block, both polarities',
-  );
+});
+
+test('keeps control copy concise', async ({ page }) => {
+  await page.goto('/');
+
+  await expect(page.getByText('Theme', { exact: true })).toBeVisible();
+  await expect(page.getByText('Type pairing sandbox')).toHaveCount(0);
+  await expect(
+    page.getByText(
+      'Test a heading and body font where they will actually be used.',
+    ),
+  ).toHaveCount(0);
+  await expect(
+    page.getByText('WOFF, WOFF2, TTF, or OTF. 5 MB max. Stays in this tab.'),
+  ).toBeVisible();
+  await expect(
+    page.getByText('Five metadata and layout checks. No AI.'),
+  ).toBeVisible();
+  await expect(page.locator('#layout-description')).toHaveCount(0);
+  await expect(page.locator('#preview-view-hint')).toHaveCount(0);
+  await expect(page.locator('#upload-note')).toHaveCount(0);
 });
 
 test('restores, copies, and resets share-link state', async ({
@@ -124,7 +142,7 @@ test('loads a temporary local font and refreshes its score', async ({
     .setInputFiles('tests/fixtures/fonts/ApfelGrotezk-Regular.woff2');
 
   await expect(page.locator('#upload-status')).toHaveText(
-    'ApfelGrotezk-Regular is ready for this tab only.',
+    'ApfelGrotezk-Regular is ready.',
   );
   await expect(page.locator('#heading-source')).toHaveText(
     'This tab only · sans · 400',
@@ -159,7 +177,7 @@ test('keeps every uploaded font selectable for the session', async ({
   await upload.setInputFiles('tests/fixtures/fonts/ApfelGrotezk-Fett.otf');
   await expect(page.locator('#font-error')).toHaveText('');
   await expect(page.locator('#upload-status')).toHaveText(
-    'ApfelGrotezk-Fett is ready for this tab only.',
+    'ApfelGrotezk-Fett is ready.',
   );
   await expect(page.getByLabel('Heading font')).toHaveValue('uploaded-font-2');
   await expect(
@@ -202,11 +220,8 @@ test('explains weaker hierarchy for an identical pair', async ({ page }) => {
   );
 });
 
-test('labels the active layout and honors reduced motion', async ({ page }) => {
+test('honors reduced motion', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('#layout-description')).toHaveText(
-    'Headline, action, image, benefits',
-  );
 
   await page.getByLabel('Heading font').selectOption('georgia');
   await expect(page.getByTestId('preview')).toHaveCSS(

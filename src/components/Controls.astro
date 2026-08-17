@@ -114,7 +114,6 @@ const layoutCopy: Record<LayoutId, { name: string; description: string }> = {
             <button
               type="button"
               data-layout-control={layout.id}
-              data-description={layoutCopy[layout.id].description}
               aria-pressed={layout.id === layoutId}
             >
               <strong>{layoutCopy[layout.id].name}</strong>
@@ -129,16 +128,13 @@ const layoutCopy: Record<LayoutId, { name: string; description: string }> = {
       <label for="local-font"
         ><span aria-hidden="true">04</span> Local font</label
       >
-      <p>
-        WOFF, WOFF2, TTF or OTF, up to 5 MB. It stays in this tab and is never
-        uploaded or shared.
-      </p>
+      <p>WOFF, WOFF2, TTF, or OTF. 5 MB max. Stays in this tab.</p>
       <input
         id="local-font"
         name="local-font"
         type="file"
         accept=".woff,.woff2,.ttf,.otf,font/woff,font/woff2,font/ttf,font/otf"
-        aria-describedby="upload-note upload-status"
+        aria-describedby="upload-status font-error"
       />
       <p id="upload-status" class="upload-status" aria-live="polite"></p>
       <div
@@ -150,10 +146,6 @@ const layoutCopy: Record<LayoutId, { name: string; description: string }> = {
       </div>
     </div>
 
-    <p id="upload-note" class="control-note">
-      Google fonts load only when you select them. System options use faces
-      already on your device. Nothing here needs an account.
-    </p>
     <p
       id="font-error"
       class="inline-error"

@@ -122,7 +122,6 @@
 }
 
 .upload-field p,
-.control-note,
 .inline-error {
   margin: 0;
   font-size: var(--text-md);
@@ -200,12 +199,6 @@
 .metadata-input {
   min-height: 32px;
   font-size: var(--text-xs);
-}
-
-.control-note {
-  color: var(--color-neutral-600);
-  font-size: var(--text-sm);
-  line-height: 1.55;
 }
 
 .inline-error {
