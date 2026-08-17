@@ -72,6 +72,39 @@ test('switches sheet polarity and compares both themes', async ({ page }) => {
   );
 });
 
+test('restores, copies, and resets share-link state', async ({
+  context,
+  page,
+}) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.goto('/?h=georgia&b=verdana&l=blog-article&t=dark&v=split');
+
+  await expect(page.getByLabel('Heading font')).toHaveValue('georgia');
+  await expect(page.getByLabel('Body font')).toHaveValue('verdana');
+  await expect(
+    page.getByRole('button', { name: /^Blog article/ }),
+  ).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByTestId('preview')).toHaveAttribute(
+    'data-sheet-theme',
+    'dark',
+  );
+  await expect(page.locator('[data-preview-pane]')).toHaveCount(2);
+
+  await page.getByRole('button', { name: 'Copy link' }).click();
+  await expect(page.locator('#copy-status')).toHaveText('Link copied');
+  await expect
+    .poll(() => page.evaluate(() => navigator.clipboard.readText()))
+    .toMatch(/\?h=georgia&b=verdana&l=blog-article&t=dark&v=split$/);
+
+  await page.getByRole('button', { name: 'Reset' }).click();
+  await expect(page.getByLabel('Heading font')).toHaveValue('space-grotesk');
+  await expect(page.getByTestId('preview')).toHaveAttribute(
+    'data-sheet-theme',
+    'light',
+  );
+  await expect(page.locator('[data-preview-pane]')).toHaveCount(1);
+});
+
 test('loads a temporary local font and refreshes its score', async ({
   page,
 }) => {

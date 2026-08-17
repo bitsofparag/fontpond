@@ -28,7 +28,7 @@ import {
   addUploadedFontControl,
   addUploadedFontOption,
 } from './uploaded-font-controls';
-import { bindPreviewSettings, findPreviewSettings } from './preview-settings';
+import { bindShareLinkController } from './share-link-controller';
 
 type LoadState = 'system' | 'uploaded' | 'loaded' | 'cached';
 
@@ -76,13 +76,25 @@ export async function startFontpond(
 ): Promise<Result<void, string>> {
   const references = findReferences(target);
   if (!references.ok) return references;
-  const previewSettings = findPreviewSettings(target);
-  if (!previewSettings)
-    return { ok: false, error: 'Preview settings are unavailable.' };
-
   const runtime: RuntimeState = { uploaded: new Map() };
-  bindPreviewSettings(previewSettings);
-  bindControls(references.value, runtime, loadFont, localFonts);
+  const shareLinks = bindShareLinkController(target, references.value, {
+    findFont: (id) => {
+      const result = runtimeFont(id, runtime.uploaded);
+      return result.ok ? result.value : undefined;
+    },
+    onReset: () => {
+      void updatePreview(references.value, runtime, loadFont);
+    },
+  });
+  if (!shareLinks)
+    return { ok: false, error: 'Shared controls are unavailable.' };
+  bindControls(
+    references.value,
+    runtime,
+    loadFont,
+    localFonts,
+    shareLinks.clearStatus,
+  );
   target.defaultView?.addEventListener('pagehide', () => localFonts.dispose(), {
     once: true,
   });
