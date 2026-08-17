@@ -6,6 +6,9 @@ import type { LocalFontManager } from '../../src/services/local-font-loader';
 
 function renderFixture(): void {
   document.body.innerHTML = `
+    <span id="copy-status"></span>
+    <button id="copy-link" type="button">Copy link</button>
+    <button id="reset-controls" type="button">Reset</button>
     <select id="heading-font"><option value="space-grotesk">Space Grotesk</option><option value="georgia">Georgia</option></select>
     <span id="heading-source"></span>
     <select id="body-font"><option value="source-serif-4">Source Serif 4</option><option value="verdana">Verdana</option></select>
@@ -88,7 +91,75 @@ function requireElement<T extends Element>(selector: string): T {
 }
 
 describe('Fontpond browser wiring', () => {
-  beforeEach(renderFixture);
+  beforeEach(() => {
+    window.history.replaceState({}, '', '/');
+    renderFixture();
+  });
+
+  it('restores supported controls from the shared URL', async () => {
+    window.history.replaceState(
+      {},
+      '',
+      '/?h=georgia&b=verdana&l=blog-article&t=dark&v=split',
+    );
+
+    await startFontpond(document, successfulLoader);
+
+    expect(requireElement<HTMLSelectElement>('#heading-font').value).toBe(
+      'georgia',
+    );
+    expect(requireElement<HTMLSelectElement>('#body-font').value).toBe(
+      'verdana',
+    );
+    expect(
+      requireElement<HTMLButtonElement>(
+        '[data-layout-control="blog-article"]',
+      ).getAttribute('aria-pressed'),
+    ).toBe('true');
+    expect(requireElement<HTMLElement>('#preview').dataset.sheetTheme).toBe(
+      'dark',
+    );
+    expect(document.querySelectorAll('[data-preview-pane]')).toHaveLength(2);
+  });
+
+  it('copies the complete supported state and resets every control', async () => {
+    const writeText = vi
+      .fn<(value: string) => Promise<void>>()
+      .mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText },
+    });
+    await startFontpond(document, successfulLoader);
+    requireElement<HTMLSelectElement>('#heading-font').value = 'georgia';
+    requireElement<HTMLSelectElement>('#heading-font').dispatchEvent(
+      new Event('change'),
+    );
+    requireElement<HTMLButtonElement>(
+      '[data-layout-control="blog-article"]',
+    ).click();
+    requireElement<HTMLButtonElement>('[data-sheet-control="dark"]').click();
+    requireElement<HTMLButtonElement>('[data-view-control="split"]').click();
+
+    requireElement<HTMLButtonElement>('#copy-link').click();
+    await vi.waitFor(() => expect(writeText).toHaveBeenCalledOnce());
+    expect(writeText.mock.calls[0]?.[0]).toMatch(
+      /\?h=georgia&b=source-serif-4&l=blog-article&t=dark&v=split$/,
+    );
+    expect(requireElement('#copy-status').textContent).toBe('Link copied');
+
+    requireElement<HTMLButtonElement>('#reset-controls').click();
+    await vi.waitFor(() => {
+      expect(requireElement<HTMLSelectElement>('#heading-font').value).toBe(
+        'space-grotesk',
+      );
+      expect(requireElement<HTMLElement>('#preview').dataset.sheetTheme).toBe(
+        'light',
+      );
+      expect(document.querySelectorAll('[data-preview-pane]')).toHaveLength(1);
+    });
+    expect(requireElement('#copy-status').textContent).toBe('');
+  });
 
   it('applies independent default fonts and loads both selections', async () => {
     const load = vi.fn(successfulLoader);
